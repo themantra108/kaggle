@@ -99,11 +99,14 @@ end
 predictions = predict_mode(mach, X_test)
 
 # ╔═╡ 49ddd08a-858f-47cb-9d91-bd544a4d6cb1
-output = DataFrame("Passenger" => test_data.PassengerId,
+output = DataFrame("PassengerId" => test_data.PassengerId,
 "Survived" => predictions)
 
 # ╔═╡ f3d8a88f-02e9-411c-840c-65e0d2dffcc3
 CSV.write("submission.csv", output)
+
+# ╔═╡ 1e895750-402d-4e63-a0ee-56b296348080
+CSV.read("submission.csv", DataFrame)
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
@@ -127,7 +130,7 @@ PLUTO_MANIFEST_TOML_CONTENTS = """
 
 julia_version = "1.8.5"
 manifest_format = "2.0"
-project_hash = "fe2b0917429aeb9acbf5052184d87645a8d6c1ea"
+project_hash = "758576de9fb97ef0a0f4333f14012c6742ab3dfb"
 
 [[deps.ARFFFiles]]
 deps = ["CategoricalArrays", "Dates", "Parsers", "Tables"]
@@ -964,5 +967,6 @@ version = "17.4.0+0"
 # ╠═49ddd08a-858f-47cb-9d91-bd544a4d6cb1
 # ╠═e23fcb4a-0142-48d6-b74a-c94fdcd99770
 # ╠═f3d8a88f-02e9-411c-840c-65e0d2dffcc3
+# ╠═1e895750-402d-4e63-a0ee-56b296348080
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
