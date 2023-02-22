@@ -12,9 +12,6 @@ end
 # ╔═╡ e02c1c9f-c1d9-4e8d-b57f-9aeaa4cded52
 using MLJ,MLJDecisionTreeInterface
 
-# ╔═╡ e23fcb4a-0142-48d6-b74a-c94fdcd99770
-using DelimitedFiles
-
 # ╔═╡ 39c646d9-41f0-42ad-bd29-c052dd881a21
 begin
 	train_data = CSV.read("train.csv", DataFrame)
@@ -56,7 +53,7 @@ coerce!(train_data, :age=>Continuous , :Pclass=>Multiclass ,:Sex=>Multiclass, :S
 schema(train_data)
 
 # ╔═╡ ecc87035-8cbd-4603-9749-4c2642dd5e7a
-y = train_data[!, "Survived"]
+y = train_data[:, "Survived"]
 
 # ╔═╡ 6a104669-39ec-4111-a397-4be8c45d5bd6
 features = ["Pclass", "Sex", "SibSp", "Parch"]
@@ -88,15 +85,19 @@ mach = machine(forest, X, y)
 # ╔═╡ 728549db-7b66-4a2f-89cb-7e7a7e716413
 fit!(mach)
 
-# ╔═╡ 5f359b98-5df9-4574-a6e1-91e00279dacc
-begin
-	p = predict(mach, X)
-	yhat = mode.(p)
-	accuracy(yhat, y)
-end
+# ╔═╡ b79103d8-a59f-41f6-a581-926b24ec7426
+check = CSV.read("gender_submission.csv", DataFrame)
+
+# ╔═╡ 2f81ea6e-ae3e-4726-a673-2854d5a917af
+coerce!(check, :Survived => Multiclass, :PassengerID => Count)
 
 # ╔═╡ 7689d768-4390-4cf1-b29a-bc280dd05fc8
 predictions = predict_mode(mach, X_test)
+
+# ╔═╡ 5f359b98-5df9-4574-a6e1-91e00279dacc
+begin
+	accuracy(predictions, check.Survived)
+end
 
 # ╔═╡ 49ddd08a-858f-47cb-9d91-bd544a4d6cb1
 output = DataFrame("PassengerId" => test_data.PassengerId,
@@ -113,7 +114,6 @@ PLUTO_PROJECT_TOML_CONTENTS = """
 [deps]
 CSV = "336ed68f-0bac-5ca0-87d4-7b16caf5d00b"
 DataFrames = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"
-DelimitedFiles = "8bb1440f-4735-579b-a4ab-409b98df4dab"
 MLJ = "add582a8-e3ab-11e8-2d5e-e98b27df1bc7"
 MLJDecisionTreeInterface = "c6f25543-311c-4c74-83dc-3ea6d1015661"
 
@@ -130,7 +130,7 @@ PLUTO_MANIFEST_TOML_CONTENTS = """
 
 julia_version = "1.8.5"
 manifest_format = "2.0"
-project_hash = "758576de9fb97ef0a0f4333f14012c6742ab3dfb"
+project_hash = "bd8a809291f2ff37972758338cc9c361af553a0b"
 
 [[deps.ARFFFiles]]
 deps = ["CategoricalArrays", "Dates", "Parsers", "Tables"]
@@ -962,10 +962,11 @@ version = "17.4.0+0"
 # ╠═4e34b3b5-87f6-4f13-b4b0-fae26cc19c3c
 # ╠═b3338862-c9fd-408b-8e49-3860110c6fa6
 # ╠═728549db-7b66-4a2f-89cb-7e7a7e716413
+# ╠═b79103d8-a59f-41f6-a581-926b24ec7426
+# ╠═2f81ea6e-ae3e-4726-a673-2854d5a917af
 # ╠═5f359b98-5df9-4574-a6e1-91e00279dacc
 # ╠═7689d768-4390-4cf1-b29a-bc280dd05fc8
 # ╠═49ddd08a-858f-47cb-9d91-bd544a4d6cb1
-# ╠═e23fcb4a-0142-48d6-b74a-c94fdcd99770
 # ╠═f3d8a88f-02e9-411c-840c-65e0d2dffcc3
 # ╠═1e895750-402d-4e63-a0ee-56b296348080
 # ╟─00000000-0000-0000-0000-000000000001
