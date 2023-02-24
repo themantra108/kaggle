@@ -4,110 +4,83 @@
 using Markdown
 using InteractiveUtils
 
-# ╔═╡ a62b83e0-b1b5-11ed-06fe-e1846d086442
-begin
-	using DataFrames, CSV
+# ╔═╡ 59a02c80-b348-11ed-3b60-e91278db6bbc
+using DataFrames, CSV, MLJ, MLJDecisionTreeInterface
+
+# ╔═╡ 690b29b0-65ba-4059-9b44-dc3f0d51c6e4
+X_full = CSV.read("data\\home-data-for-ml-course\\train.csv", DataFrame);
+
+# ╔═╡ a43d5769-edb3-4a0b-ac12-42e6f799329c
+X_test_full = CSV.read("data\\home-data-for-ml-course\\test.csv", DataFrame);
+
+# ╔═╡ 76f316e3-0834-4524-afe3-1c5eab71b979
+y = X_full.SalePrice;
+
+# ╔═╡ 1bc4d347-fc7d-4ef1-a4e8-9968203f02c6
+features = [:LotArea, :YearBuilt, Symbol("1stFlrSF"), Symbol("2ndFlrSF"), :FullBath, :BedroomAbvGr, :TotRmsAbvGrd];
+
+# ╔═╡ 2260a3ce-3cc4-4654-9bba-513bbf48c9b9
+X = copy(X_full[:,features]);
+
+# ╔═╡ bb8a2fad-4591-4c8b-88a8-d30144f83274
+X_test = copy(X_test_full[:,features]);
+
+# ╔═╡ 8f2fd439-e093-4ba7-9d65-eba33b47e546
+(X_train, X_valid), (y_train, y_valid) = partition((X, y), 0.8, multi=true)
+
+# ╔═╡ d1dbf656-7ab4-4663-82bd-75569b886dc8
+Forest = @load RandomForestRegressor pkg=DecisionTree verbosity = 0
+
+# ╔═╡ 75b721f5-fc13-4890-adc4-e106ece39349
+model_1 = Forest(n_trees=50, rng=0);
+
+# ╔═╡ d51ef33f-e119-4b06-997b-5167536bbb60
+model_2 = Forest(n_trees=100, rng=0);
+
+# ╔═╡ 2235dbb7-80e8-41a0-b1a1-1ef48d7ae101
+model_3 = Forest(n_trees=100, feature_importance= :split, rng=0);
+
+# ╔═╡ 1dc6319e-fa49-45ec-9907-24f473a9976a
+model_4 = Forest(n_trees=200, min_samples_split=20, rng=0);
+
+# ╔═╡ 72ad5e92-8125-42ae-b094-9ab1da2ccbab
+model_5 = Forest(n_trees=100, max_depth=7, rng=0); 
+
+# ╔═╡ 00e953d0-5fdb-4b12-86f8-bd4763026072
+models = [model_1, model_2, model_3, model_4, model_5];
+
+# ╔═╡ 780a80e4-5a7b-464c-9ef3-4d0d051af341
+function score_model(model; X_t = X_train, X_v = X_valid, y_t = y_train, y_v = y_valid)
+	mach = machine(model, X_t, y_t, scitype_check_level=0)
+	fit!(mach, verbosity=0)
+	preds = predict(mach, X_v)
+	return mean_absolute_error(preds, y_v)
 end
 
-# ╔═╡ e02c1c9f-c1d9-4e8d-b57f-9aeaa4cded52
-using MLJ, MLJDecisionTreeInterface
-
-# ╔═╡ 39c646d9-41f0-42ad-bd29-c052dd881a21
-begin
-	train_data = CSV.read("titanic//train.csv", DataFrame)
-	train_data[1:5,:]
+# ╔═╡ 85777a92-b290-4439-aa32-586bab979f5c
+for i in 1:length(models)
+	mae = score_model(models[i])
+	println("Model $(i) MAE: $(mae)")
 end
 
-# ╔═╡ bade51f3-2e1f-4f16-bafc-efdc90c49a17
-begin
-	test_data = CSV.read("titanic//test.csv", DataFrame)
-	test_data[1:5,:]
-end
+# ╔═╡ 4056e3f0-1d15-4ef0-ba0d-5fe5623188e7
+best_model = model_3;
 
-# ╔═╡ 03059e05-6419-4612-9e7b-ee879a0440d7
-begin
-	women = train_data[train_data.Sex .== "female", :Survived]
-	rate_women = sum(women)/length(women)
-	println("% of women survied: ", rate_women)
-end
+# ╔═╡ e44c2c32-35c1-42a1-9256-9078d59dd221
+my_model = machine(best_model, X, y, scitype_check_level=0);
 
-# ╔═╡ 41385fa4-409b-40e9-be71-dea10d892864
-begin
-	men = train_data[train_data.Sex .== "male", :Survived]
-	rate_men = sum(men)/length(men)
-	println("% of men survied: ", rate_men)
-end
+# ╔═╡ e68d4534-5564-426a-bd6c-87c55e7eeca1
+fit!(my_model)
 
-# ╔═╡ d3ac3f24-7024-4775-b1ff-5d5b31f1a1fd
-describe(train_data)
+# ╔═╡ 07caef1c-f476-40ad-a0f7-8ddc97745962
+preds_test = predict(my_model, X_test)
 
-# ╔═╡ 6a83b0f6-0e2c-464b-93a0-d40783f80679
-md"""
-## Scientific datatype
-"""
+# ╔═╡ f9d6564b-ff4e-47ce-af89-2260b0f119bb
+output = DataFrame("Id" => X_test_full.Id,
+                       "SalePrice" => preds_test)
 
-# ╔═╡ aeff12ab-0c12-4e2d-93e9-1901eb6c27cb
-coerce!(train_data, :age=>Continuous , :Pclass=>Multiclass ,:Sex=>Multiclass, :Survived=>Multiclass)
-
-# ╔═╡ 4fecde81-54f1-431c-b0ee-f26358cd2643
-schema(train_data)
-
-# ╔═╡ ecc87035-8cbd-4603-9749-4c2642dd5e7a
-y = train_data[:, "Survived"]
-
-# ╔═╡ 6a104669-39ec-4111-a397-4be8c45d5bd6
-features = ["Pclass", "Sex", "SibSp", "Parch"]
-
-# ╔═╡ fd7c1a4a-1bad-4abc-8b45-acc7893d7055
-X = train_data[:,features]
-
-# ╔═╡ d3a80eb1-92ff-4e66-80a0-27f37d6f9adb
-schema(X)
-
-# ╔═╡ 81135ca4-131d-4f0a-87c3-6e3a5cb963d7
-coerce!(test_data, :age=>Continuous , :Pclass=>Multiclass ,:Sex=>Multiclass)
-
-# ╔═╡ 70db24e0-f1a3-4d2b-97dc-e15dc3cb86fe
-X_test = test_data[:,features]
-
-# ╔═╡ 2ca4df31-9146-446c-8163-a52c3e14fe68
-schema(X_test)
-
-# ╔═╡ 002ba50f-0c28-4668-9972-52659d607abf
-Forest = @load RandomForestClassifier pkg=DecisionTree verbosity=0
-
-# ╔═╡ 4e34b3b5-87f6-4f13-b4b0-fae26cc19c3c
-forest = Forest(n_trees= 10, max_depth = 5)
-
-# ╔═╡ b3338862-c9fd-408b-8e49-3860110c6fa6
-mach = machine(forest, X, y)
-
-# ╔═╡ 728549db-7b66-4a2f-89cb-7e7a7e716413
-fit!(mach)
-
-# ╔═╡ b79103d8-a59f-41f6-a581-926b24ec7426
-check = CSV.read("titanic//gender_submission.csv", DataFrame)
-
-# ╔═╡ 2f81ea6e-ae3e-4726-a673-2854d5a917af
-coerce!(check, :Survived => Multiclass, :PassengerID => Count)
-
-# ╔═╡ 7689d768-4390-4cf1-b29a-bc280dd05fc8
-predictions = predict_mode(mach, X_test)
-
-# ╔═╡ 5f359b98-5df9-4574-a6e1-91e00279dacc
-begin
-	accuracy(predictions, check.Survived)
-end
-
-# ╔═╡ 49ddd08a-858f-47cb-9d91-bd544a4d6cb1
-output = DataFrame("PassengerId" => test_data.PassengerId,
-"Survived" => predictions)
-
-# ╔═╡ f3d8a88f-02e9-411c-840c-65e0d2dffcc3
-CSV.write("titanic//submission.csv", output)
-
-# ╔═╡ 1e895750-402d-4e63-a0ee-56b296348080
-CSV.read("titanic//submission.csv", DataFrame)
+# ╔═╡ d8d8cc96-716d-4467-8642-f3fdb7dfbd99
+CSV.write("data\\home-data-for-ml-course\\submissions_02x01.csv", output)
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
@@ -406,9 +379,9 @@ uuid = "41ab1584-1d38-5bbf-9106-f11c6c58b48f"
 version = "1.2.0"
 
 [[deps.IrrationalConstants]]
-git-tree-sha1 = "7fd44fd4ff43fc60815f8e764c0f352b83c49151"
+git-tree-sha1 = "637b58b3c037d3877f263418de820920b47ceeb5"
 uuid = "92d709cd-6900-40b7-9082-c6be49f344b6"
-version = "0.1.1"
+version = "0.2.0"
 
 [[deps.IterationControl]]
 deps = ["EarlyStopping", "InteractiveUtils"]
@@ -789,9 +762,9 @@ uuid = "2f01184e-e22b-5df5-ae63-d93ebab69eaf"
 
 [[deps.SpecialFunctions]]
 deps = ["ChainRulesCore", "IrrationalConstants", "LogExpFunctions", "OpenLibm_jll", "OpenSpecFun_jll"]
-git-tree-sha1 = "d75bda01f8c31ebb72df80a46c88b25d1c79c56d"
+git-tree-sha1 = "ef28127915f4229c971eb43f3fc075dd3fe91880"
 uuid = "276daf66-3868-5448-9aa4-cd146d93841b"
-version = "2.1.7"
+version = "2.2.0"
 
 [[deps.StableRNGs]]
 deps = ["Random", "Test"]
@@ -834,9 +807,9 @@ version = "0.33.21"
 
 [[deps.StatsFuns]]
 deps = ["ChainRulesCore", "HypergeometricFunctions", "InverseFunctions", "IrrationalConstants", "LogExpFunctions", "Reexport", "Rmath", "SpecialFunctions"]
-git-tree-sha1 = "ab6083f09b3e617e34a956b43e9d51b824206932"
+git-tree-sha1 = "53cd758b96903d556e96f11b8cd2169c7e9f08af"
 uuid = "4c63d2b9-4356-54db-8cca-17b64c39e42c"
-version = "1.1.1"
+version = "1.2.0"
 
 [[deps.StringManipulation]]
 git-tree-sha1 = "46da2434b41f41ac3594ee9816ce5541c6096123"
@@ -941,33 +914,28 @@ version = "17.4.0+0"
 """
 
 # ╔═╡ Cell order:
-# ╠═a62b83e0-b1b5-11ed-06fe-e1846d086442
-# ╠═39c646d9-41f0-42ad-bd29-c052dd881a21
-# ╠═bade51f3-2e1f-4f16-bafc-efdc90c49a17
-# ╠═03059e05-6419-4612-9e7b-ee879a0440d7
-# ╠═41385fa4-409b-40e9-be71-dea10d892864
-# ╠═d3ac3f24-7024-4775-b1ff-5d5b31f1a1fd
-# ╟─6a83b0f6-0e2c-464b-93a0-d40783f80679
-# ╠═aeff12ab-0c12-4e2d-93e9-1901eb6c27cb
-# ╠═4fecde81-54f1-431c-b0ee-f26358cd2643
-# ╠═ecc87035-8cbd-4603-9749-4c2642dd5e7a
-# ╠═6a104669-39ec-4111-a397-4be8c45d5bd6
-# ╠═fd7c1a4a-1bad-4abc-8b45-acc7893d7055
-# ╠═d3a80eb1-92ff-4e66-80a0-27f37d6f9adb
-# ╠═81135ca4-131d-4f0a-87c3-6e3a5cb963d7
-# ╠═70db24e0-f1a3-4d2b-97dc-e15dc3cb86fe
-# ╠═2ca4df31-9146-446c-8163-a52c3e14fe68
-# ╠═e02c1c9f-c1d9-4e8d-b57f-9aeaa4cded52
-# ╠═002ba50f-0c28-4668-9972-52659d607abf
-# ╠═4e34b3b5-87f6-4f13-b4b0-fae26cc19c3c
-# ╠═b3338862-c9fd-408b-8e49-3860110c6fa6
-# ╠═728549db-7b66-4a2f-89cb-7e7a7e716413
-# ╠═b79103d8-a59f-41f6-a581-926b24ec7426
-# ╠═2f81ea6e-ae3e-4726-a673-2854d5a917af
-# ╠═5f359b98-5df9-4574-a6e1-91e00279dacc
-# ╠═7689d768-4390-4cf1-b29a-bc280dd05fc8
-# ╠═49ddd08a-858f-47cb-9d91-bd544a4d6cb1
-# ╠═f3d8a88f-02e9-411c-840c-65e0d2dffcc3
-# ╠═1e895750-402d-4e63-a0ee-56b296348080
+# ╠═59a02c80-b348-11ed-3b60-e91278db6bbc
+# ╠═690b29b0-65ba-4059-9b44-dc3f0d51c6e4
+# ╠═a43d5769-edb3-4a0b-ac12-42e6f799329c
+# ╠═76f316e3-0834-4524-afe3-1c5eab71b979
+# ╠═1bc4d347-fc7d-4ef1-a4e8-9968203f02c6
+# ╠═2260a3ce-3cc4-4654-9bba-513bbf48c9b9
+# ╠═bb8a2fad-4591-4c8b-88a8-d30144f83274
+# ╠═8f2fd439-e093-4ba7-9d65-eba33b47e546
+# ╠═d1dbf656-7ab4-4663-82bd-75569b886dc8
+# ╠═75b721f5-fc13-4890-adc4-e106ece39349
+# ╠═d51ef33f-e119-4b06-997b-5167536bbb60
+# ╠═2235dbb7-80e8-41a0-b1a1-1ef48d7ae101
+# ╠═1dc6319e-fa49-45ec-9907-24f473a9976a
+# ╠═72ad5e92-8125-42ae-b094-9ab1da2ccbab
+# ╠═00e953d0-5fdb-4b12-86f8-bd4763026072
+# ╠═780a80e4-5a7b-464c-9ef3-4d0d051af341
+# ╠═85777a92-b290-4439-aa32-586bab979f5c
+# ╠═4056e3f0-1d15-4ef0-ba0d-5fe5623188e7
+# ╠═e44c2c32-35c1-42a1-9256-9078d59dd221
+# ╠═e68d4534-5564-426a-bd6c-87c55e7eeca1
+# ╠═07caef1c-f476-40ad-a0f7-8ddc97745962
+# ╠═f9d6564b-ff4e-47ce-af89-2260b0f119bb
+# ╠═d8d8cc96-716d-4467-8642-f3fdb7dfbd99
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002

@@ -1,136 +1,8 @@
-### A Pluto.jl notebook ###
-# v0.19.22
-
-using Markdown
-using InteractiveUtils
-
-# ╔═╡ a62b83e0-b1b5-11ed-06fe-e1846d086442
-begin
-	using DataFrames, CSV
-end
-
-# ╔═╡ e02c1c9f-c1d9-4e8d-b57f-9aeaa4cded52
-using MLJ, MLJDecisionTreeInterface
-
-# ╔═╡ 39c646d9-41f0-42ad-bd29-c052dd881a21
-begin
-	train_data = CSV.read("titanic//train.csv", DataFrame)
-	train_data[1:5,:]
-end
-
-# ╔═╡ bade51f3-2e1f-4f16-bafc-efdc90c49a17
-begin
-	test_data = CSV.read("titanic//test.csv", DataFrame)
-	test_data[1:5,:]
-end
-
-# ╔═╡ 03059e05-6419-4612-9e7b-ee879a0440d7
-begin
-	women = train_data[train_data.Sex .== "female", :Survived]
-	rate_women = sum(women)/length(women)
-	println("% of women survied: ", rate_women)
-end
-
-# ╔═╡ 41385fa4-409b-40e9-be71-dea10d892864
-begin
-	men = train_data[train_data.Sex .== "male", :Survived]
-	rate_men = sum(men)/length(men)
-	println("% of men survied: ", rate_men)
-end
-
-# ╔═╡ d3ac3f24-7024-4775-b1ff-5d5b31f1a1fd
-describe(train_data)
-
-# ╔═╡ 6a83b0f6-0e2c-464b-93a0-d40783f80679
-md"""
-## Scientific datatype
-"""
-
-# ╔═╡ aeff12ab-0c12-4e2d-93e9-1901eb6c27cb
-coerce!(train_data, :age=>Continuous , :Pclass=>Multiclass ,:Sex=>Multiclass, :Survived=>Multiclass)
-
-# ╔═╡ 4fecde81-54f1-431c-b0ee-f26358cd2643
-schema(train_data)
-
-# ╔═╡ ecc87035-8cbd-4603-9749-4c2642dd5e7a
-y = train_data[:, "Survived"]
-
-# ╔═╡ 6a104669-39ec-4111-a397-4be8c45d5bd6
-features = ["Pclass", "Sex", "SibSp", "Parch"]
-
-# ╔═╡ fd7c1a4a-1bad-4abc-8b45-acc7893d7055
-X = train_data[:,features]
-
-# ╔═╡ d3a80eb1-92ff-4e66-80a0-27f37d6f9adb
-schema(X)
-
-# ╔═╡ 81135ca4-131d-4f0a-87c3-6e3a5cb963d7
-coerce!(test_data, :age=>Continuous , :Pclass=>Multiclass ,:Sex=>Multiclass)
-
-# ╔═╡ 70db24e0-f1a3-4d2b-97dc-e15dc3cb86fe
-X_test = test_data[:,features]
-
-# ╔═╡ 2ca4df31-9146-446c-8163-a52c3e14fe68
-schema(X_test)
-
-# ╔═╡ 002ba50f-0c28-4668-9972-52659d607abf
-Forest = @load RandomForestClassifier pkg=DecisionTree verbosity=0
-
-# ╔═╡ 4e34b3b5-87f6-4f13-b4b0-fae26cc19c3c
-forest = Forest(n_trees= 10, max_depth = 5)
-
-# ╔═╡ b3338862-c9fd-408b-8e49-3860110c6fa6
-mach = machine(forest, X, y)
-
-# ╔═╡ 728549db-7b66-4a2f-89cb-7e7a7e716413
-fit!(mach)
-
-# ╔═╡ b79103d8-a59f-41f6-a581-926b24ec7426
-check = CSV.read("titanic//gender_submission.csv", DataFrame)
-
-# ╔═╡ 2f81ea6e-ae3e-4726-a673-2854d5a917af
-coerce!(check, :Survived => Multiclass, :PassengerID => Count)
-
-# ╔═╡ 7689d768-4390-4cf1-b29a-bc280dd05fc8
-predictions = predict_mode(mach, X_test)
-
-# ╔═╡ 5f359b98-5df9-4574-a6e1-91e00279dacc
-begin
-	accuracy(predictions, check.Survived)
-end
-
-# ╔═╡ 49ddd08a-858f-47cb-9d91-bd544a4d6cb1
-output = DataFrame("PassengerId" => test_data.PassengerId,
-"Survived" => predictions)
-
-# ╔═╡ f3d8a88f-02e9-411c-840c-65e0d2dffcc3
-CSV.write("titanic//submission.csv", output)
-
-# ╔═╡ 1e895750-402d-4e63-a0ee-56b296348080
-CSV.read("titanic//submission.csv", DataFrame)
-
-# ╔═╡ 00000000-0000-0000-0000-000000000001
-PLUTO_PROJECT_TOML_CONTENTS = """
-[deps]
-CSV = "336ed68f-0bac-5ca0-87d4-7b16caf5d00b"
-DataFrames = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"
-MLJ = "add582a8-e3ab-11e8-2d5e-e98b27df1bc7"
-MLJDecisionTreeInterface = "c6f25543-311c-4c74-83dc-3ea6d1015661"
-
-[compat]
-CSV = "~0.10.9"
-DataFrames = "~1.5.0"
-MLJ = "~0.19.1"
-MLJDecisionTreeInterface = "~0.3.1"
-"""
-
-# ╔═╡ 00000000-0000-0000-0000-000000000002
-PLUTO_MANIFEST_TOML_CONTENTS = """
 # This file is machine-generated - editing it directly is not advised
 
 julia_version = "1.8.5"
 manifest_format = "2.0"
-project_hash = "bd8a809291f2ff37972758338cc9c361af553a0b"
+project_hash = "271265e81886a905eb66d74f3d42fd33f2240359"
 
 [[deps.ARFFFiles]]
 deps = ["CategoricalArrays", "Dates", "Parsers", "Tables"]
@@ -309,9 +181,9 @@ uuid = "8ba89e20-285c-5b6f-9357-94700520ee1b"
 
 [[deps.Distributions]]
 deps = ["ChainRulesCore", "DensityInterface", "FillArrays", "LinearAlgebra", "PDMats", "Printf", "QuadGK", "Random", "SparseArrays", "SpecialFunctions", "Statistics", "StatsBase", "StatsFuns", "Test"]
-git-tree-sha1 = "9258430c176319dc882efa4088e2ff882a0cb1f1"
+git-tree-sha1 = "9a782b47da6ee4cb3d041764e0c6830469105984"
 uuid = "31c24e10-a181-5473-b8eb-7969acd0382f"
-version = "0.25.81"
+version = "0.25.83"
 
 [[deps.DocStringExtensions]]
 deps = ["LibGit2"]
@@ -406,9 +278,9 @@ uuid = "41ab1584-1d38-5bbf-9106-f11c6c58b48f"
 version = "1.2.0"
 
 [[deps.IrrationalConstants]]
-git-tree-sha1 = "7fd44fd4ff43fc60815f8e764c0f352b83c49151"
+git-tree-sha1 = "3868cac300a188a7c3a74f9abd930e52ce1a7a51"
 uuid = "92d709cd-6900-40b7-9082-c6be49f344b6"
-version = "0.1.1"
+version = "0.2.1"
 
 [[deps.IterationControl]]
 deps = ["EarlyStopping", "InteractiveUtils"]
@@ -789,9 +661,9 @@ uuid = "2f01184e-e22b-5df5-ae63-d93ebab69eaf"
 
 [[deps.SpecialFunctions]]
 deps = ["ChainRulesCore", "IrrationalConstants", "LogExpFunctions", "OpenLibm_jll", "OpenSpecFun_jll"]
-git-tree-sha1 = "d75bda01f8c31ebb72df80a46c88b25d1c79c56d"
+git-tree-sha1 = "ef28127915f4229c971eb43f3fc075dd3fe91880"
 uuid = "276daf66-3868-5448-9aa4-cd146d93841b"
-version = "2.1.7"
+version = "2.2.0"
 
 [[deps.StableRNGs]]
 deps = ["Random", "Test"]
@@ -834,9 +706,9 @@ version = "0.33.21"
 
 [[deps.StatsFuns]]
 deps = ["ChainRulesCore", "HypergeometricFunctions", "InverseFunctions", "IrrationalConstants", "LogExpFunctions", "Reexport", "Rmath", "SpecialFunctions"]
-git-tree-sha1 = "ab6083f09b3e617e34a956b43e9d51b824206932"
+git-tree-sha1 = "5aa6250a781e567388f3285fb4b0f214a501b4d5"
 uuid = "4c63d2b9-4356-54db-8cca-17b64c39e42c"
-version = "1.1.1"
+version = "1.2.1"
 
 [[deps.StringManipulation]]
 git-tree-sha1 = "46da2434b41f41ac3594ee9816ce5541c6096123"
@@ -938,36 +810,3 @@ version = "1.48.0+0"
 deps = ["Artifacts", "Libdl"]
 uuid = "3f19e933-33d8-53b3-aaab-bd5110c3b7a0"
 version = "17.4.0+0"
-"""
-
-# ╔═╡ Cell order:
-# ╠═a62b83e0-b1b5-11ed-06fe-e1846d086442
-# ╠═39c646d9-41f0-42ad-bd29-c052dd881a21
-# ╠═bade51f3-2e1f-4f16-bafc-efdc90c49a17
-# ╠═03059e05-6419-4612-9e7b-ee879a0440d7
-# ╠═41385fa4-409b-40e9-be71-dea10d892864
-# ╠═d3ac3f24-7024-4775-b1ff-5d5b31f1a1fd
-# ╟─6a83b0f6-0e2c-464b-93a0-d40783f80679
-# ╠═aeff12ab-0c12-4e2d-93e9-1901eb6c27cb
-# ╠═4fecde81-54f1-431c-b0ee-f26358cd2643
-# ╠═ecc87035-8cbd-4603-9749-4c2642dd5e7a
-# ╠═6a104669-39ec-4111-a397-4be8c45d5bd6
-# ╠═fd7c1a4a-1bad-4abc-8b45-acc7893d7055
-# ╠═d3a80eb1-92ff-4e66-80a0-27f37d6f9adb
-# ╠═81135ca4-131d-4f0a-87c3-6e3a5cb963d7
-# ╠═70db24e0-f1a3-4d2b-97dc-e15dc3cb86fe
-# ╠═2ca4df31-9146-446c-8163-a52c3e14fe68
-# ╠═e02c1c9f-c1d9-4e8d-b57f-9aeaa4cded52
-# ╠═002ba50f-0c28-4668-9972-52659d607abf
-# ╠═4e34b3b5-87f6-4f13-b4b0-fae26cc19c3c
-# ╠═b3338862-c9fd-408b-8e49-3860110c6fa6
-# ╠═728549db-7b66-4a2f-89cb-7e7a7e716413
-# ╠═b79103d8-a59f-41f6-a581-926b24ec7426
-# ╠═2f81ea6e-ae3e-4726-a673-2854d5a917af
-# ╠═5f359b98-5df9-4574-a6e1-91e00279dacc
-# ╠═7689d768-4390-4cf1-b29a-bc280dd05fc8
-# ╠═49ddd08a-858f-47cb-9d91-bd544a4d6cb1
-# ╠═f3d8a88f-02e9-411c-840c-65e0d2dffcc3
-# ╠═1e895750-402d-4e63-a0ee-56b296348080
-# ╟─00000000-0000-0000-0000-000000000001
-# ╟─00000000-0000-0000-0000-000000000002

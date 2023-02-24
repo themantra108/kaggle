@@ -4,110 +4,56 @@
 using Markdown
 using InteractiveUtils
 
-# ╔═╡ a62b83e0-b1b5-11ed-06fe-e1846d086442
+# ╔═╡ ae3673a0-b2f1-11ed-19fb-6344a6127e80
+using DataFrames, CSV, MLJ, MLJDecisionTreeInterface
+
+# ╔═╡ 2ca18a68-072b-47aa-814b-66d49eeb3c72
 begin
-	using DataFrames, CSV
+	iowa_file_path = "data\\home-data-for-ml-course\\train.csv"
+	home_data = CSV.read(iowa_file_path, DataFrame);
+	y = home_data.SalePrice;
+	feature_names = [:LotArea, :YearBuilt, Symbol("1stFlrSF"), Symbol("2ndFlrSF"), :FullBath, :BedroomAbvGr, :TotRmsAbvGrd];
+	X = home_data[:, feature_names];
+
+	# Split into validation and training data
+	(Xtrain, Xtest), (ytrain, ytest) = partition((X, y), 0.8, rng=123, multi=true);
+	
+	# Specify Model
+	Tree = @load DecisionTreeRegressor pkg=DecisionTree verbosity=0
+	iowa_model = Tree()
+	mach = machine(iowa_model, Xtrain, ytrain, scitype_check_level=0)
+	# Fit Model
+	fit!(mach, verbosity = 0)
+	val_predictions = predict(mach, Xtest)
+	val_mae = mean_absolute_error(val_predictions, ytest)
+	println("Validation MAE when not specifying max_leaf_nodes: $(round(Int, val_mae))")
+
+	# Using best value for max_leaf_nodes
+	iowa_model = Tree(min_samples_leaf=5, rng=1)
+	mach = machine(iowa_model, Xtrain, ytrain, scitype_check_level=0)
+	fit!(mach, verbosity = 0)
+	val_predictions = predict(mach, Xtest)
+	val_mae = mean_absolute_error(val_predictions, ytest)
+	println("Validation MAE for best value of max_leaf_nodes: $(round(Int, val_mae))")
 end
 
-# ╔═╡ e02c1c9f-c1d9-4e8d-b57f-9aeaa4cded52
-using MLJ, MLJDecisionTreeInterface
+# ╔═╡ 738b523c-9fa2-4e8d-9300-bc5e9abff6c1
+Forest = @load RandomForestRegressor pkg=DecisionTree verbosity=0
 
-# ╔═╡ 39c646d9-41f0-42ad-bd29-c052dd881a21
-begin
-	train_data = CSV.read("titanic//train.csv", DataFrame)
-	train_data[1:5,:]
-end
+# ╔═╡ 6836009c-6eb4-40df-8c9f-5d9a95e9d2de
+forest = Forest()
 
-# ╔═╡ bade51f3-2e1f-4f16-bafc-efdc90c49a17
-begin
-	test_data = CSV.read("titanic//test.csv", DataFrame)
-	test_data[1:5,:]
-end
+# ╔═╡ 4bd5e77b-cd85-4b67-9ff7-dc66f9ffb9a1
+rf_model = machine(forest, Xtrain, ytrain, scitype_check_level=0)
 
-# ╔═╡ 03059e05-6419-4612-9e7b-ee879a0440d7
-begin
-	women = train_data[train_data.Sex .== "female", :Survived]
-	rate_women = sum(women)/length(women)
-	println("% of women survied: ", rate_women)
-end
+# ╔═╡ ac139e94-d6cd-4c0b-b5d1-dc04f22492ba
+fit!(rf_model)
 
-# ╔═╡ 41385fa4-409b-40e9-be71-dea10d892864
-begin
-	men = train_data[train_data.Sex .== "male", :Survived]
-	rate_men = sum(men)/length(men)
-	println("% of men survied: ", rate_men)
-end
+# ╔═╡ 4e728760-dfad-42f4-9e82-c6c187854b4d
+rf_val_predictions = predict(rf_model, Xtest)
 
-# ╔═╡ d3ac3f24-7024-4775-b1ff-5d5b31f1a1fd
-describe(train_data)
-
-# ╔═╡ 6a83b0f6-0e2c-464b-93a0-d40783f80679
-md"""
-## Scientific datatype
-"""
-
-# ╔═╡ aeff12ab-0c12-4e2d-93e9-1901eb6c27cb
-coerce!(train_data, :age=>Continuous , :Pclass=>Multiclass ,:Sex=>Multiclass, :Survived=>Multiclass)
-
-# ╔═╡ 4fecde81-54f1-431c-b0ee-f26358cd2643
-schema(train_data)
-
-# ╔═╡ ecc87035-8cbd-4603-9749-4c2642dd5e7a
-y = train_data[:, "Survived"]
-
-# ╔═╡ 6a104669-39ec-4111-a397-4be8c45d5bd6
-features = ["Pclass", "Sex", "SibSp", "Parch"]
-
-# ╔═╡ fd7c1a4a-1bad-4abc-8b45-acc7893d7055
-X = train_data[:,features]
-
-# ╔═╡ d3a80eb1-92ff-4e66-80a0-27f37d6f9adb
-schema(X)
-
-# ╔═╡ 81135ca4-131d-4f0a-87c3-6e3a5cb963d7
-coerce!(test_data, :age=>Continuous , :Pclass=>Multiclass ,:Sex=>Multiclass)
-
-# ╔═╡ 70db24e0-f1a3-4d2b-97dc-e15dc3cb86fe
-X_test = test_data[:,features]
-
-# ╔═╡ 2ca4df31-9146-446c-8163-a52c3e14fe68
-schema(X_test)
-
-# ╔═╡ 002ba50f-0c28-4668-9972-52659d607abf
-Forest = @load RandomForestClassifier pkg=DecisionTree verbosity=0
-
-# ╔═╡ 4e34b3b5-87f6-4f13-b4b0-fae26cc19c3c
-forest = Forest(n_trees= 10, max_depth = 5)
-
-# ╔═╡ b3338862-c9fd-408b-8e49-3860110c6fa6
-mach = machine(forest, X, y)
-
-# ╔═╡ 728549db-7b66-4a2f-89cb-7e7a7e716413
-fit!(mach)
-
-# ╔═╡ b79103d8-a59f-41f6-a581-926b24ec7426
-check = CSV.read("titanic//gender_submission.csv", DataFrame)
-
-# ╔═╡ 2f81ea6e-ae3e-4726-a673-2854d5a917af
-coerce!(check, :Survived => Multiclass, :PassengerID => Count)
-
-# ╔═╡ 7689d768-4390-4cf1-b29a-bc280dd05fc8
-predictions = predict_mode(mach, X_test)
-
-# ╔═╡ 5f359b98-5df9-4574-a6e1-91e00279dacc
-begin
-	accuracy(predictions, check.Survived)
-end
-
-# ╔═╡ 49ddd08a-858f-47cb-9d91-bd544a4d6cb1
-output = DataFrame("PassengerId" => test_data.PassengerId,
-"Survived" => predictions)
-
-# ╔═╡ f3d8a88f-02e9-411c-840c-65e0d2dffcc3
-CSV.write("titanic//submission.csv", output)
-
-# ╔═╡ 1e895750-402d-4e63-a0ee-56b296348080
-CSV.read("titanic//submission.csv", DataFrame)
+# ╔═╡ 6684f789-1f7f-4cd3-801a-a7e07e95137e
+rf_val_mae = mean_absolute_error(rf_val_predictions, ytest)
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
@@ -130,7 +76,7 @@ PLUTO_MANIFEST_TOML_CONTENTS = """
 
 julia_version = "1.8.5"
 manifest_format = "2.0"
-project_hash = "bd8a809291f2ff37972758338cc9c361af553a0b"
+project_hash = "271265e81886a905eb66d74f3d42fd33f2240359"
 
 [[deps.ARFFFiles]]
 deps = ["CategoricalArrays", "Dates", "Parsers", "Tables"]
@@ -406,9 +352,9 @@ uuid = "41ab1584-1d38-5bbf-9106-f11c6c58b48f"
 version = "1.2.0"
 
 [[deps.IrrationalConstants]]
-git-tree-sha1 = "7fd44fd4ff43fc60815f8e764c0f352b83c49151"
+git-tree-sha1 = "637b58b3c037d3877f263418de820920b47ceeb5"
 uuid = "92d709cd-6900-40b7-9082-c6be49f344b6"
-version = "0.1.1"
+version = "0.2.0"
 
 [[deps.IterationControl]]
 deps = ["EarlyStopping", "InteractiveUtils"]
@@ -789,9 +735,9 @@ uuid = "2f01184e-e22b-5df5-ae63-d93ebab69eaf"
 
 [[deps.SpecialFunctions]]
 deps = ["ChainRulesCore", "IrrationalConstants", "LogExpFunctions", "OpenLibm_jll", "OpenSpecFun_jll"]
-git-tree-sha1 = "d75bda01f8c31ebb72df80a46c88b25d1c79c56d"
+git-tree-sha1 = "ef28127915f4229c971eb43f3fc075dd3fe91880"
 uuid = "276daf66-3868-5448-9aa4-cd146d93841b"
-version = "2.1.7"
+version = "2.2.0"
 
 [[deps.StableRNGs]]
 deps = ["Random", "Test"]
@@ -834,9 +780,9 @@ version = "0.33.21"
 
 [[deps.StatsFuns]]
 deps = ["ChainRulesCore", "HypergeometricFunctions", "InverseFunctions", "IrrationalConstants", "LogExpFunctions", "Reexport", "Rmath", "SpecialFunctions"]
-git-tree-sha1 = "ab6083f09b3e617e34a956b43e9d51b824206932"
+git-tree-sha1 = "53cd758b96903d556e96f11b8cd2169c7e9f08af"
 uuid = "4c63d2b9-4356-54db-8cca-17b64c39e42c"
-version = "1.1.1"
+version = "1.2.0"
 
 [[deps.StringManipulation]]
 git-tree-sha1 = "46da2434b41f41ac3594ee9816ce5541c6096123"
@@ -941,33 +887,13 @@ version = "17.4.0+0"
 """
 
 # ╔═╡ Cell order:
-# ╠═a62b83e0-b1b5-11ed-06fe-e1846d086442
-# ╠═39c646d9-41f0-42ad-bd29-c052dd881a21
-# ╠═bade51f3-2e1f-4f16-bafc-efdc90c49a17
-# ╠═03059e05-6419-4612-9e7b-ee879a0440d7
-# ╠═41385fa4-409b-40e9-be71-dea10d892864
-# ╠═d3ac3f24-7024-4775-b1ff-5d5b31f1a1fd
-# ╟─6a83b0f6-0e2c-464b-93a0-d40783f80679
-# ╠═aeff12ab-0c12-4e2d-93e9-1901eb6c27cb
-# ╠═4fecde81-54f1-431c-b0ee-f26358cd2643
-# ╠═ecc87035-8cbd-4603-9749-4c2642dd5e7a
-# ╠═6a104669-39ec-4111-a397-4be8c45d5bd6
-# ╠═fd7c1a4a-1bad-4abc-8b45-acc7893d7055
-# ╠═d3a80eb1-92ff-4e66-80a0-27f37d6f9adb
-# ╠═81135ca4-131d-4f0a-87c3-6e3a5cb963d7
-# ╠═70db24e0-f1a3-4d2b-97dc-e15dc3cb86fe
-# ╠═2ca4df31-9146-446c-8163-a52c3e14fe68
-# ╠═e02c1c9f-c1d9-4e8d-b57f-9aeaa4cded52
-# ╠═002ba50f-0c28-4668-9972-52659d607abf
-# ╠═4e34b3b5-87f6-4f13-b4b0-fae26cc19c3c
-# ╠═b3338862-c9fd-408b-8e49-3860110c6fa6
-# ╠═728549db-7b66-4a2f-89cb-7e7a7e716413
-# ╠═b79103d8-a59f-41f6-a581-926b24ec7426
-# ╠═2f81ea6e-ae3e-4726-a673-2854d5a917af
-# ╠═5f359b98-5df9-4574-a6e1-91e00279dacc
-# ╠═7689d768-4390-4cf1-b29a-bc280dd05fc8
-# ╠═49ddd08a-858f-47cb-9d91-bd544a4d6cb1
-# ╠═f3d8a88f-02e9-411c-840c-65e0d2dffcc3
-# ╠═1e895750-402d-4e63-a0ee-56b296348080
+# ╠═ae3673a0-b2f1-11ed-19fb-6344a6127e80
+# ╠═2ca18a68-072b-47aa-814b-66d49eeb3c72
+# ╠═738b523c-9fa2-4e8d-9300-bc5e9abff6c1
+# ╠═6836009c-6eb4-40df-8c9f-5d9a95e9d2de
+# ╠═4bd5e77b-cd85-4b67-9ff7-dc66f9ffb9a1
+# ╠═ac139e94-d6cd-4c0b-b5d1-dc04f22492ba
+# ╠═4e728760-dfad-42f4-9e82-c6c187854b4d
+# ╠═6684f789-1f7f-4cd3-801a-a7e07e95137e
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002

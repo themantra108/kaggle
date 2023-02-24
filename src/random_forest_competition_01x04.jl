@@ -4,110 +4,53 @@
 using Markdown
 using InteractiveUtils
 
-# ╔═╡ a62b83e0-b1b5-11ed-06fe-e1846d086442
+# ╔═╡ 9ddae550-b2fa-11ed-1cff-8bfff3026733
+using DataFrames, CSV, MLJ, MLJDecisionTreeInterface
+
+# ╔═╡ ef052fb0-69e3-45e6-aff0-e125ba7bf56c
 begin
-	using DataFrames, CSV
+	iowa_file_path = "data\\home-data-for-ml-course\\train.csv"
+	home_data = CSV.read(iowa_file_path, DataFrame)
+	y = home_data.SalePrice
+	feature_names = [:LotArea, :YearBuilt, Symbol("1stFlrSF"), Symbol("2ndFlrSF"), :FullBath, :BedroomAbvGr, :TotRmsAbvGrd]
+	X = home_data[:, feature_names]
 end
 
-# ╔═╡ e02c1c9f-c1d9-4e8d-b57f-9aeaa4cded52
-using MLJ, MLJDecisionTreeInterface
+# ╔═╡ e4993614-bae2-483d-abb8-66b448f64478
+Forest = @load RandomForestRegressor pkg=DecisionTree verbosity=0
 
-# ╔═╡ 39c646d9-41f0-42ad-bd29-c052dd881a21
-begin
-	train_data = CSV.read("titanic//train.csv", DataFrame)
-	train_data[1:5,:]
-end
+# ╔═╡ c17d8989-0719-4d29-bae4-9dbb34066bea
+forest = Forest()
 
-# ╔═╡ bade51f3-2e1f-4f16-bafc-efdc90c49a17
-begin
-	test_data = CSV.read("titanic//test.csv", DataFrame)
-	test_data[1:5,:]
-end
+# ╔═╡ b7f9ac6f-7bbc-4d75-bffa-86aa0d6d122d
+mach = machine(forest, X, y, scitype_check_level=0)
 
-# ╔═╡ 03059e05-6419-4612-9e7b-ee879a0440d7
-begin
-	women = train_data[train_data.Sex .== "female", :Survived]
-	rate_women = sum(women)/length(women)
-	println("% of women survied: ", rate_women)
-end
-
-# ╔═╡ 41385fa4-409b-40e9-be71-dea10d892864
-begin
-	men = train_data[train_data.Sex .== "male", :Survived]
-	rate_men = sum(men)/length(men)
-	println("% of men survied: ", rate_men)
-end
-
-# ╔═╡ d3ac3f24-7024-4775-b1ff-5d5b31f1a1fd
-describe(train_data)
-
-# ╔═╡ 6a83b0f6-0e2c-464b-93a0-d40783f80679
-md"""
-## Scientific datatype
-"""
-
-# ╔═╡ aeff12ab-0c12-4e2d-93e9-1901eb6c27cb
-coerce!(train_data, :age=>Continuous , :Pclass=>Multiclass ,:Sex=>Multiclass, :Survived=>Multiclass)
-
-# ╔═╡ 4fecde81-54f1-431c-b0ee-f26358cd2643
-schema(train_data)
-
-# ╔═╡ ecc87035-8cbd-4603-9749-4c2642dd5e7a
-y = train_data[:, "Survived"]
-
-# ╔═╡ 6a104669-39ec-4111-a397-4be8c45d5bd6
-features = ["Pclass", "Sex", "SibSp", "Parch"]
-
-# ╔═╡ fd7c1a4a-1bad-4abc-8b45-acc7893d7055
-X = train_data[:,features]
-
-# ╔═╡ d3a80eb1-92ff-4e66-80a0-27f37d6f9adb
-schema(X)
-
-# ╔═╡ 81135ca4-131d-4f0a-87c3-6e3a5cb963d7
-coerce!(test_data, :age=>Continuous , :Pclass=>Multiclass ,:Sex=>Multiclass)
-
-# ╔═╡ 70db24e0-f1a3-4d2b-97dc-e15dc3cb86fe
-X_test = test_data[:,features]
-
-# ╔═╡ 2ca4df31-9146-446c-8163-a52c3e14fe68
-schema(X_test)
-
-# ╔═╡ 002ba50f-0c28-4668-9972-52659d607abf
-Forest = @load RandomForestClassifier pkg=DecisionTree verbosity=0
-
-# ╔═╡ 4e34b3b5-87f6-4f13-b4b0-fae26cc19c3c
-forest = Forest(n_trees= 10, max_depth = 5)
-
-# ╔═╡ b3338862-c9fd-408b-8e49-3860110c6fa6
-mach = machine(forest, X, y)
-
-# ╔═╡ 728549db-7b66-4a2f-89cb-7e7a7e716413
+# ╔═╡ 4909ed18-577a-490b-aaa7-b2f9f73bef5e
 fit!(mach)
 
-# ╔═╡ b79103d8-a59f-41f6-a581-926b24ec7426
-check = CSV.read("titanic//gender_submission.csv", DataFrame)
+# ╔═╡ d38382c6-eb80-4f88-a203-311d305981e8
+test_data_path = "data\\home-data-for-ml-course\\test.csv"
 
-# ╔═╡ 2f81ea6e-ae3e-4726-a673-2854d5a917af
-coerce!(check, :Survived => Multiclass, :PassengerID => Count)
+# ╔═╡ f2301433-8465-499a-a9af-445c358c572c
+test_data = CSV.read(test_data_path, DataFrame)
 
-# ╔═╡ 7689d768-4390-4cf1-b29a-bc280dd05fc8
-predictions = predict_mode(mach, X_test)
+# ╔═╡ e9da55b8-2a45-46f3-8d80-f8382cfad87b
+test_X = test_data[:,feature_names];
 
-# ╔═╡ 5f359b98-5df9-4574-a6e1-91e00279dacc
-begin
-	accuracy(predictions, check.Survived)
-end
+# ╔═╡ 3624bfdc-7183-4527-a7d5-cb0fe010a34b
+test_preds = predict(mach, test_X)
 
-# ╔═╡ 49ddd08a-858f-47cb-9d91-bd544a4d6cb1
-output = DataFrame("PassengerId" => test_data.PassengerId,
-"Survived" => predictions)
+# ╔═╡ eb78ab1c-ed0c-4395-8245-2702560f1520
+output = DataFrame(:ID => test_data.Id,:SalePrice => test_preds)
 
-# ╔═╡ f3d8a88f-02e9-411c-840c-65e0d2dffcc3
-CSV.write("titanic//submission.csv", output)
+# ╔═╡ e04a4aeb-4771-4b6d-840b-8e711f46a524
+CSV.write("data\\home-data-for-ml-course\\submissions.csv", output)
 
-# ╔═╡ 1e895750-402d-4e63-a0ee-56b296348080
-CSV.read("titanic//submission.csv", DataFrame)
+# ╔═╡ b3d31de8-c3b7-4474-9876-56575ed3f898
+ŷ = predict(mach, X)
+
+# ╔═╡ 31fbad07-0f7b-4317-9c9a-9f5ecbc825b7
+mean_absolute_error(ŷ, y)
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
@@ -406,9 +349,9 @@ uuid = "41ab1584-1d38-5bbf-9106-f11c6c58b48f"
 version = "1.2.0"
 
 [[deps.IrrationalConstants]]
-git-tree-sha1 = "7fd44fd4ff43fc60815f8e764c0f352b83c49151"
+git-tree-sha1 = "637b58b3c037d3877f263418de820920b47ceeb5"
 uuid = "92d709cd-6900-40b7-9082-c6be49f344b6"
-version = "0.1.1"
+version = "0.2.0"
 
 [[deps.IterationControl]]
 deps = ["EarlyStopping", "InteractiveUtils"]
@@ -789,9 +732,9 @@ uuid = "2f01184e-e22b-5df5-ae63-d93ebab69eaf"
 
 [[deps.SpecialFunctions]]
 deps = ["ChainRulesCore", "IrrationalConstants", "LogExpFunctions", "OpenLibm_jll", "OpenSpecFun_jll"]
-git-tree-sha1 = "d75bda01f8c31ebb72df80a46c88b25d1c79c56d"
+git-tree-sha1 = "ef28127915f4229c971eb43f3fc075dd3fe91880"
 uuid = "276daf66-3868-5448-9aa4-cd146d93841b"
-version = "2.1.7"
+version = "2.2.0"
 
 [[deps.StableRNGs]]
 deps = ["Random", "Test"]
@@ -834,9 +777,9 @@ version = "0.33.21"
 
 [[deps.StatsFuns]]
 deps = ["ChainRulesCore", "HypergeometricFunctions", "InverseFunctions", "IrrationalConstants", "LogExpFunctions", "Reexport", "Rmath", "SpecialFunctions"]
-git-tree-sha1 = "ab6083f09b3e617e34a956b43e9d51b824206932"
+git-tree-sha1 = "53cd758b96903d556e96f11b8cd2169c7e9f08af"
 uuid = "4c63d2b9-4356-54db-8cca-17b64c39e42c"
-version = "1.1.1"
+version = "1.2.0"
 
 [[deps.StringManipulation]]
 git-tree-sha1 = "46da2434b41f41ac3594ee9816ce5541c6096123"
@@ -941,33 +884,19 @@ version = "17.4.0+0"
 """
 
 # ╔═╡ Cell order:
-# ╠═a62b83e0-b1b5-11ed-06fe-e1846d086442
-# ╠═39c646d9-41f0-42ad-bd29-c052dd881a21
-# ╠═bade51f3-2e1f-4f16-bafc-efdc90c49a17
-# ╠═03059e05-6419-4612-9e7b-ee879a0440d7
-# ╠═41385fa4-409b-40e9-be71-dea10d892864
-# ╠═d3ac3f24-7024-4775-b1ff-5d5b31f1a1fd
-# ╟─6a83b0f6-0e2c-464b-93a0-d40783f80679
-# ╠═aeff12ab-0c12-4e2d-93e9-1901eb6c27cb
-# ╠═4fecde81-54f1-431c-b0ee-f26358cd2643
-# ╠═ecc87035-8cbd-4603-9749-4c2642dd5e7a
-# ╠═6a104669-39ec-4111-a397-4be8c45d5bd6
-# ╠═fd7c1a4a-1bad-4abc-8b45-acc7893d7055
-# ╠═d3a80eb1-92ff-4e66-80a0-27f37d6f9adb
-# ╠═81135ca4-131d-4f0a-87c3-6e3a5cb963d7
-# ╠═70db24e0-f1a3-4d2b-97dc-e15dc3cb86fe
-# ╠═2ca4df31-9146-446c-8163-a52c3e14fe68
-# ╠═e02c1c9f-c1d9-4e8d-b57f-9aeaa4cded52
-# ╠═002ba50f-0c28-4668-9972-52659d607abf
-# ╠═4e34b3b5-87f6-4f13-b4b0-fae26cc19c3c
-# ╠═b3338862-c9fd-408b-8e49-3860110c6fa6
-# ╠═728549db-7b66-4a2f-89cb-7e7a7e716413
-# ╠═b79103d8-a59f-41f6-a581-926b24ec7426
-# ╠═2f81ea6e-ae3e-4726-a673-2854d5a917af
-# ╠═5f359b98-5df9-4574-a6e1-91e00279dacc
-# ╠═7689d768-4390-4cf1-b29a-bc280dd05fc8
-# ╠═49ddd08a-858f-47cb-9d91-bd544a4d6cb1
-# ╠═f3d8a88f-02e9-411c-840c-65e0d2dffcc3
-# ╠═1e895750-402d-4e63-a0ee-56b296348080
+# ╠═9ddae550-b2fa-11ed-1cff-8bfff3026733
+# ╠═ef052fb0-69e3-45e6-aff0-e125ba7bf56c
+# ╠═e4993614-bae2-483d-abb8-66b448f64478
+# ╠═c17d8989-0719-4d29-bae4-9dbb34066bea
+# ╠═b7f9ac6f-7bbc-4d75-bffa-86aa0d6d122d
+# ╠═4909ed18-577a-490b-aaa7-b2f9f73bef5e
+# ╠═d38382c6-eb80-4f88-a203-311d305981e8
+# ╠═f2301433-8465-499a-a9af-445c358c572c
+# ╠═e9da55b8-2a45-46f3-8d80-f8382cfad87b
+# ╠═3624bfdc-7183-4527-a7d5-cb0fe010a34b
+# ╠═eb78ab1c-ed0c-4395-8245-2702560f1520
+# ╠═e04a4aeb-4771-4b6d-840b-8e711f46a524
+# ╠═b3d31de8-c3b7-4474-9876-56575ed3f898
+# ╠═31fbad07-0f7b-4317-9c9a-9f5ecbc825b7
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002

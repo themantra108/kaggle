@@ -4,110 +4,68 @@
 using Markdown
 using InteractiveUtils
 
-# ╔═╡ a62b83e0-b1b5-11ed-06fe-e1846d086442
+# ╔═╡ ef39854f-23cf-44cd-9956-8093963c0403
+using DataFrames, CSV, MLJ, MLJDecisionTreeInterface
+
+# ╔═╡ ece68e30-b294-11ed-01f0-43b623bd2e0b
 begin
-	using DataFrames, CSV
+	iowa_file_path = "data\\home-data-for-ml-course\\train.csv"
+	home_data = CSV.read(iowa_file_path, DataFrame);
+	y = home_data.SalePrice;
+	feature_names = [:LotArea, :YearBuilt, Symbol("1stFlrSF"), Symbol("2ndFlrSF"), :FullBath, :BedroomAbvGr, :TotRmsAbvGrd];
+	X = home_data[:, feature_names];
+	
+	# Specify Model
+	Tree = @load DecisionTreeRegressor pkg=DecisionTree verbosity=0
+	iowa_model = Tree()
+	mach = machine(iowa_model, X, y, scitype_check_level=0)
+	
+	# Fit Model
+	fit!(mach)
+	predictions = predict(mach, X)
+	
+	println("First in-sample predictions:", predictions[1:5])
+	println("Actual target values for those homes:", y[1:5])
+	mean_absolute_error(predictions, y)
 end
 
-# ╔═╡ e02c1c9f-c1d9-4e8d-b57f-9aeaa4cded52
-using MLJ, MLJDecisionTreeInterface
+# ╔═╡ fc511cd5-6c2c-44f4-9d07-73b5a3b344f2
+(Xtrain, Xtest), (ytrain, ytest) = partition((X, y), 0.8, rng=123, multi=true);
 
-# ╔═╡ 39c646d9-41f0-42ad-bd29-c052dd881a21
-begin
-	train_data = CSV.read("titanic//train.csv", DataFrame)
-	train_data[1:5,:]
+# ╔═╡ b3674c88-98c0-4fe1-984e-71faf9694afc
+function get_mae(min_samples_leaf, Xtrain, Xtest, ytrain, ytest)
+    model = DecisionTreeRegressor(min_samples_leaf = min_samples_leaf, rng=0)
+    mach1 = machine(model, Xtrain, ytrain, scitype_check_level=0)
+	fit!(mach1)
+    preds_val = predict(mach1, Xtest)
+    mae = mean_absolute_error(preds_val, ytest)
+    return (mae)
 end
 
-# ╔═╡ bade51f3-2e1f-4f16-bafc-efdc90c49a17
-begin
-	test_data = CSV.read("titanic//test.csv", DataFrame)
-	test_data[1:5,:]
-end
+# ╔═╡ 86f305e6-cb68-40ad-ad28-7bc313f30c5a
+#candidate_max_leaf_nodes = [5, 25, 50, 100, 250, 500]
+candidate_max_leaf_nodes = [5,6,7,8,9,10]
 
-# ╔═╡ 03059e05-6419-4612-9e7b-ee879a0440d7
-begin
-	women = train_data[train_data.Sex .== "female", :Survived]
-	rate_women = sum(women)/length(women)
-	println("% of women survied: ", rate_women)
-end
+# ╔═╡ 0b62e0c7-881a-4380-8639-45eae471b996
+scores = [get_mae(leaf_size, Xtrain, Xtest, ytrain, ytest) => leaf_size for leaf_size in candidate_max_leaf_nodes]
 
-# ╔═╡ 41385fa4-409b-40e9-be71-dea10d892864
-begin
-	men = train_data[train_data.Sex .== "male", :Survived]
-	rate_men = sum(men)/length(men)
-	println("% of men survied: ", rate_men)
-end
+# ╔═╡ dfc723a4-dcf0-415c-8016-5e97c55c59f3
+best_tree_size = (minimum(scores)).second
 
-# ╔═╡ d3ac3f24-7024-4775-b1ff-5d5b31f1a1fd
-describe(train_data)
+# ╔═╡ 6032152d-af3f-4cf0-99a7-bf6b878de5c4
+final_model = Tree(min_samples_leaf = best_tree_size, rng = 123)  
 
-# ╔═╡ 6a83b0f6-0e2c-464b-93a0-d40783f80679
-md"""
-## Scientific datatype
-"""
+# ╔═╡ 7e0be6c3-3ff5-4445-af55-1e652611e0fa
+final_mach = machine(final_model, X, y, scitype_check_level=0)
 
-# ╔═╡ aeff12ab-0c12-4e2d-93e9-1901eb6c27cb
-coerce!(train_data, :age=>Continuous , :Pclass=>Multiclass ,:Sex=>Multiclass, :Survived=>Multiclass)
+# ╔═╡ b21c53bc-429c-4e5d-ac91-44443127d8a0
+fit!(final_mach)
 
-# ╔═╡ 4fecde81-54f1-431c-b0ee-f26358cd2643
-schema(train_data)
+# ╔═╡ 68040020-02b4-4218-8c8f-529e992c343d
+ŷ = predict(final_mach, X)
 
-# ╔═╡ ecc87035-8cbd-4603-9749-4c2642dd5e7a
-y = train_data[:, "Survived"]
-
-# ╔═╡ 6a104669-39ec-4111-a397-4be8c45d5bd6
-features = ["Pclass", "Sex", "SibSp", "Parch"]
-
-# ╔═╡ fd7c1a4a-1bad-4abc-8b45-acc7893d7055
-X = train_data[:,features]
-
-# ╔═╡ d3a80eb1-92ff-4e66-80a0-27f37d6f9adb
-schema(X)
-
-# ╔═╡ 81135ca4-131d-4f0a-87c3-6e3a5cb963d7
-coerce!(test_data, :age=>Continuous , :Pclass=>Multiclass ,:Sex=>Multiclass)
-
-# ╔═╡ 70db24e0-f1a3-4d2b-97dc-e15dc3cb86fe
-X_test = test_data[:,features]
-
-# ╔═╡ 2ca4df31-9146-446c-8163-a52c3e14fe68
-schema(X_test)
-
-# ╔═╡ 002ba50f-0c28-4668-9972-52659d607abf
-Forest = @load RandomForestClassifier pkg=DecisionTree verbosity=0
-
-# ╔═╡ 4e34b3b5-87f6-4f13-b4b0-fae26cc19c3c
-forest = Forest(n_trees= 10, max_depth = 5)
-
-# ╔═╡ b3338862-c9fd-408b-8e49-3860110c6fa6
-mach = machine(forest, X, y)
-
-# ╔═╡ 728549db-7b66-4a2f-89cb-7e7a7e716413
-fit!(mach)
-
-# ╔═╡ b79103d8-a59f-41f6-a581-926b24ec7426
-check = CSV.read("titanic//gender_submission.csv", DataFrame)
-
-# ╔═╡ 2f81ea6e-ae3e-4726-a673-2854d5a917af
-coerce!(check, :Survived => Multiclass, :PassengerID => Count)
-
-# ╔═╡ 7689d768-4390-4cf1-b29a-bc280dd05fc8
-predictions = predict_mode(mach, X_test)
-
-# ╔═╡ 5f359b98-5df9-4574-a6e1-91e00279dacc
-begin
-	accuracy(predictions, check.Survived)
-end
-
-# ╔═╡ 49ddd08a-858f-47cb-9d91-bd544a4d6cb1
-output = DataFrame("PassengerId" => test_data.PassengerId,
-"Survived" => predictions)
-
-# ╔═╡ f3d8a88f-02e9-411c-840c-65e0d2dffcc3
-CSV.write("titanic//submission.csv", output)
-
-# ╔═╡ 1e895750-402d-4e63-a0ee-56b296348080
-CSV.read("titanic//submission.csv", DataFrame)
+# ╔═╡ c7b97e97-72e3-420f-94d4-140fd536b9f0
+mean_absolute_error(ŷ, y)
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
@@ -941,33 +899,17 @@ version = "17.4.0+0"
 """
 
 # ╔═╡ Cell order:
-# ╠═a62b83e0-b1b5-11ed-06fe-e1846d086442
-# ╠═39c646d9-41f0-42ad-bd29-c052dd881a21
-# ╠═bade51f3-2e1f-4f16-bafc-efdc90c49a17
-# ╠═03059e05-6419-4612-9e7b-ee879a0440d7
-# ╠═41385fa4-409b-40e9-be71-dea10d892864
-# ╠═d3ac3f24-7024-4775-b1ff-5d5b31f1a1fd
-# ╟─6a83b0f6-0e2c-464b-93a0-d40783f80679
-# ╠═aeff12ab-0c12-4e2d-93e9-1901eb6c27cb
-# ╠═4fecde81-54f1-431c-b0ee-f26358cd2643
-# ╠═ecc87035-8cbd-4603-9749-4c2642dd5e7a
-# ╠═6a104669-39ec-4111-a397-4be8c45d5bd6
-# ╠═fd7c1a4a-1bad-4abc-8b45-acc7893d7055
-# ╠═d3a80eb1-92ff-4e66-80a0-27f37d6f9adb
-# ╠═81135ca4-131d-4f0a-87c3-6e3a5cb963d7
-# ╠═70db24e0-f1a3-4d2b-97dc-e15dc3cb86fe
-# ╠═2ca4df31-9146-446c-8163-a52c3e14fe68
-# ╠═e02c1c9f-c1d9-4e8d-b57f-9aeaa4cded52
-# ╠═002ba50f-0c28-4668-9972-52659d607abf
-# ╠═4e34b3b5-87f6-4f13-b4b0-fae26cc19c3c
-# ╠═b3338862-c9fd-408b-8e49-3860110c6fa6
-# ╠═728549db-7b66-4a2f-89cb-7e7a7e716413
-# ╠═b79103d8-a59f-41f6-a581-926b24ec7426
-# ╠═2f81ea6e-ae3e-4726-a673-2854d5a917af
-# ╠═5f359b98-5df9-4574-a6e1-91e00279dacc
-# ╠═7689d768-4390-4cf1-b29a-bc280dd05fc8
-# ╠═49ddd08a-858f-47cb-9d91-bd544a4d6cb1
-# ╠═f3d8a88f-02e9-411c-840c-65e0d2dffcc3
-# ╠═1e895750-402d-4e63-a0ee-56b296348080
+# ╠═ef39854f-23cf-44cd-9956-8093963c0403
+# ╠═ece68e30-b294-11ed-01f0-43b623bd2e0b
+# ╠═fc511cd5-6c2c-44f4-9d07-73b5a3b344f2
+# ╠═b3674c88-98c0-4fe1-984e-71faf9694afc
+# ╠═86f305e6-cb68-40ad-ad28-7bc313f30c5a
+# ╠═0b62e0c7-881a-4380-8639-45eae471b996
+# ╠═dfc723a4-dcf0-415c-8016-5e97c55c59f3
+# ╠═6032152d-af3f-4cf0-99a7-bf6b878de5c4
+# ╠═7e0be6c3-3ff5-4445-af55-1e652611e0fa
+# ╠═b21c53bc-429c-4e5d-ac91-44443127d8a0
+# ╠═68040020-02b4-4218-8c8f-529e992c343d
+# ╠═c7b97e97-72e3-420f-94d4-140fd536b9f0
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
