@@ -4,196 +4,293 @@
 using Markdown
 using InteractiveUtils
 
-# ╔═╡ 862f68ae-b4ce-11ed-2f35-b706fd2c4574
-using DataFrames, CSV, MLJ, MLJDecisionTreeInterface
+# ╔═╡ 0246f270-b5dc-11ed-31b1-57eff55d0c61
+using DataFrames, CSV, MLJ, MLJDecisionTreeInterface, CategoricalArrays, BetaML
 
-# ╔═╡ 9d6d84c8-2718-42ea-a15e-ca1e2e4410b9
-X_full = CSV.read("data\\home-data-for-ml-course\\train.csv", DataFrame);
-
-# ╔═╡ af332b2d-e5df-4f8c-9099-cea12df949e0
-X_test_full = CSV.read("data\\home-data-for-ml-course\\test.csv", DataFrame);
-
-# ╔═╡ ac68a399-9070-48ba-953f-6b9052a88bff
-describe(X_full);
-
-# ╔═╡ e0f32a33-d78a-480b-8cca-ea9c06b106e7
-#subset!(X_full, :SalePrice => ByRow(!=("missing"))) 
-# filter SalePrice by row in place
-
-# ╔═╡ 8dedba60-7f89-47b9-bc74-7ae512ff9b6a
-dropmissing!(X_full, Cols(:SalePrice));
-
-# ╔═╡ 084afa6a-f2d1-49a1-8c0c-becc33a21c95
-y = X_full.SalePrice;
-
-# ╔═╡ 00f6bb2e-edbd-4f1a-aa56-1e621b7ec88a
+# ╔═╡ 0ae4c1ac-b139-41cb-9af4-6cbd209d5f5b
 md"""
-##  Fixing data type
-### convert String type to *Int type and  missing*
+## Step 1: Read the data
 """
 
-# ╔═╡ c4b828ef-4ad1-4f71-8248-11eca5e8db89
-X_full.LotFrontage = something.(tryparse.(Int, X_full.LotFrontage), missing);
-
-# ╔═╡ 99bb9cac-6bd6-4538-8572-a591813ac5a9
-X_full.MasVnrArea = something.(tryparse.(Int, X_full.MasVnrArea), missing);
-
-# ╔═╡ d19a9871-6ddd-4efb-8b13-5c63c0582793
-X_full.GarageYrBlt = something.(tryparse.(Int, X_full.GarageYrBlt), missing);
-
-# ╔═╡ dbe4da80-9cd6-4485-8b20-808f16591fcb
-select!(X_full, Not(:SalePrice)); # drop column SalePrice in Place
-
-# ╔═╡ 457a12fd-65cc-4c3d-b681-c3d7f96f981a
-size(X_full)
-
-# ╔═╡ 666567a7-4332-4e1a-95cd-d148c79cadbc
-X = select(X_full, Cols(x -> eltype(X_full[:, x]) <: Union{Number,Missing})); # 
-
-# ╔═╡ 33a1687e-0e33-4395-91b3-3f3e6b0f156a
-X_full
-
-# ╔═╡ aad9c4fd-c2b5-4fc6-a5ff-a5f14f30fbd9
-size(X)
-
-# ╔═╡ 2c46c5ca-be1c-4bd1-a330-e8cc3b3ecf5b
+# ╔═╡ 8e560e35-5125-4c54-9dee-339d12588491
 begin
-	X_test_full.LotFrontage = something.(tryparse.(Int, X_test_full.LotFrontage), missing);
-	X_test_full.MasVnrArea = something.(tryparse.(Int, X_test_full.MasVnrArea), missing);
-	X_test_full.GarageYrBlt = something.(tryparse.(Int, X_test_full.GarageYrBlt), missing);
-	X_test_full.BsmtFinSF1 = something.(tryparse.(Int, X_test_full.BsmtFinSF1), missing);
-	X_test_full.BsmtFinSF2 = something.(tryparse.(Int, X_test_full.BsmtFinSF2), missing);
-	X_test_full.BsmtUnfSF = something.(tryparse.(Int, X_test_full.BsmtUnfSF), missing);
-	X_test_full.TotalBsmtSF = something.(tryparse.(Int, X_test_full.TotalBsmtSF), missing);
-	X_test_full.GarageCars = something.(tryparse.(Int, X_test_full.GarageCars), missing);
-	X_test_full.GarageArea = something.(tryparse.(Int, X_test_full.GarageArea), missing);
-	X_test_full.BsmtFullBath = something.(tryparse.(Int, X_test_full.BsmtFullBath), missing);
-	X_test_full.BsmtHalfBath = something.(tryparse.(Int, X_test_full.BsmtHalfBath), missing);
-end
+	X = CSV.read("data\\home-data-for-ml-course\\train.csv", missingstring="NA", DataFrame)
+	X_test = CSV.read("data\\home-data-for-ml-course\\test.csv", missingstring="NA", DataFrame)
+end;
 
-# ╔═╡ 232b7e6a-0697-45bf-90ca-337839fa5728
-X_test_full
+# ╔═╡ 4088970c-b4fe-4838-9082-c1ea4a138601
+schema(X)|> DataFrame;
 
-# ╔═╡ fc7fe2c9-dae1-46e1-aaa9-cc72e8607c9d
-size(X_test_full)
+# ╔═╡ 1e45f8e1-d24c-4eb7-aee9-76446af785ae
+describe(X);
 
-# ╔═╡ 56016aea-7244-4945-bdea-315d9c98548b
-X_test = select(X_test_full, Cols(x -> eltype(X_test_full[:, x]) <: Union{Number, Missing}));
-
-# ╔═╡ 0a83bb74-ba5e-4a17-b6ad-dd901011b54a
-size(X_test)
-
-# ╔═╡ dbfd72f1-3022-4a8a-9b69-a314d8fef6e9
-(X_train, X_valid), (y_train, y_valid) = partition((X, y), 0.8, multi=true, rng=0);
-
-# ╔═╡ d6fcc16d-be9c-4ea7-9e10-4df65d3111c9
+# ╔═╡ c4b40c08-34e3-43dd-9cd9-c8f749c5da9c
 md"""
-## Preliminary Investigation
+## Step2 : Drop missing rows from target column
 """
 
-# ╔═╡ 42bc55e8-d002-43db-ab26-c1ac33b9aaa6
-begin
-	println("(nrows, ncols)")
-	@show size(X_train);
-end
+# ╔═╡ 562c45ae-1536-4fc7-91c7-319662a44236
+dropmissing!(X, :SalePrice);
+# in this case there is no missing rows in SalePrice Column
 
-# ╔═╡ 1f84e261-b99e-4657-ba2b-f5ba2e882e77
-describe(X_train, :nmissing)
+# ╔═╡ cdbe92bc-3ce2-4ac4-b4f4-104de649203a
+md"""
+## Step 3: Seperate target from predictors
+#### target column assigned to y and then column droped from predictors 
+"""
 
-# ╔═╡ 99f2160d-b4e8-49d7-a32d-5ccbbcbe5f80
-# Function for comparing different approaches
+# ╔═╡ fc106c69-5a31-4f41-b1f8-f89f118c8310
+y = X.SalePrice;
+
+# ╔═╡ 5cd6b7ad-54df-4368-b070-4c1c5c3f1eb5
+select!(X, Not(:SalePrice)); # drop column SalePrice in Place
+
+# ╔═╡ a7b272d8-5938-4201-890c-e2b3df0f82d2
+# since this reactive notebook same variable names cannot be used
+# y, X = unpack(X, ==(:SalePrice))
+
+# ╔═╡ 5876b257-9c74-4b24-ae6f-fac95726569f
+md"""
+## Step 4: Data Cleaning
+"""
+
+# ╔═╡ a28dea95-9993-4da9-8d7d-c17ce338bca2
+cols_with_missing = names(X, any.(ismissing, eachcol(X))) # columns names that contain missing values
+
+# ╔═╡ da485bba-b442-46a9-8015-9f969cf844a6
+select!(X, Not(cols_with_missing)); # drop column with missing values
+
+# ╔═╡ 75278211-7bb2-4bb1-b976-3b722eeb6c37
+md"""
+## check X_test for datatype mismatch
+"""
+
+# ╔═╡ 562eec95-3b0f-403c-8ca4-2d0a1310a7fc
+select!(X_test, Not(cols_with_missing)); # drop column with missing values
+
+# ╔═╡ fe475b62-0bed-430f-8a05-4a912af3f76d
+size(X), size(X_test)
+
+# ╔═╡ 5e34a25b-c0c8-4439-b997-125cbf8b8e31
+md"""
+## Break off validation set from training data
+"""
+
+# ╔═╡ 3dd27220-35c6-4cff-a45c-44ec43998ba1
+(X_train, X_valid), (y_train, y_valid) = MLJ.partition((X, y), 0.8, rng=0, multi=true);
+
+# ╔═╡ 5ec978ff-1c51-46f6-921d-3c2f2e8da047
+first(X_train, 5) # X_train[1:5,:]
+
+# ╔═╡ a836f6af-b1e4-4cce-9d23-3209efc6b967
+Forest = @load RandomForestRegressor pkg=DecisionTree verbosity=0
+
+# ╔═╡ 6d89b8de-9cd1-4465-bc39-6aa0218776e5
 function score_dataset(X_train, X_valid, y_train, y_valid)
-	Forest = @load RandomForestRegressor pkg=DecisionTree verbosity=0
-    model = Forest(n_trees=100, rng=0)
-    mach = machine(model, X_train, y_train, scitype_check_level=0)
-	fit!(mach, verbosity=0)
-    preds = predict(mach, X_valid)
+	model = Forest(n_trees=100, rng=0)
+    mach = machine(model, X_train, y_train, scitype_check_level=0) |> MLJ.fit!
+    preds = MLJ.predict(mach, X_valid)
     return mean_absolute_error(preds, y_valid)
 end
 
-# ╔═╡ 51412838-9222-4d96-b785-5da995a0d29e
-cols_with_missing = names(X_train, any.(ismissing, eachcol(X_train))) # pick columns that contain missing values
-
-# ╔═╡ 808ce094-a94f-4a46-9ae7-644fef7402c5
-reduced_X_train = select(X_train, Not(cols_with_missing));
-
-# ╔═╡ 52e494e6-29ff-4b15-94e2-7e1ab8f1cd8c
-reduced_X_valid = select(X_valid, Not(cols_with_missing));
-
-# ╔═╡ 5b7e3df8-498c-4fad-b68d-315863dd62fe
-begin
-	println("MAE (Drop columns with missing values):")
-	println(score_dataset(reduced_X_train, reduced_X_valid, y_train, y_valid))
-end
-
-# ╔═╡ ef94c803-cfea-4ad1-89f7-4600111b8cb6
-my_imputer = FillImputer()
-
-# ╔═╡ 0da72a72-ee11-4532-ae93-0b298d91eeed
-mach = machine(my_imputer, X_train) |> fit!
-
-# ╔═╡ 14fe3ec4-3a06-42d7-9d10-a41f2707f7c9
-imputed_X_train = MLJ.transform(mach, X_train);
-
-# ╔═╡ a3a748fe-2e01-4538-8d00-3ad911bcc0c8
-imputed_X_valid = MLJ.transform(mach, X_valid);
-
-# ╔═╡ bb97b4d4-ce9e-4b0b-9911-2e3ef85691f4
-begin
-	println("MAE (Imputation):")
-	println(score_dataset(imputed_X_train, imputed_X_valid, y_train, y_valid))
-end
-
-# ╔═╡ 841d97f9-16ce-45d1-8b75-e5feeea3e0ce
+# ╔═╡ a8c9339c-46cd-4fd2-808b-2db9425fe151
 md"""
-## Part A
+### Drop columns with categorical data
+in case of julia we droped column containing String Data for equivalent result in Tutorial
 """
 
-# ╔═╡ b51fd4e7-2db7-4555-8a85-c7aab81fdd00
+# ╔═╡ 42bbe56a-dda3-4662-a305-77ab47938312
+drop_X_train = select(X_train, Not(Cols(x -> eltype(X_train[:,x]) <: AbstractString)));
+
+# ╔═╡ 0af40da0-54d5-4688-807e-cac37bc46987
+names(drop_X_train) # checking Column names in drop_X_train
+
+# ╔═╡ d11cdc8b-5cb0-4b4a-a208-2c3a54fe142b
+drop_X_valid = select(X_valid, Not(Cols(x -> eltype(X_valid[:,x]) <: AbstractString)));
+
+# ╔═╡ 33cc6295-1998-432d-a289-9aba94b95e12
+size(drop_X_train), size(drop_X_valid)
+
+# ╔═╡ e1ba8e7e-f967-4b93-918f-13e50727bef1
 begin
-	final_imputer = FillImputer()
-	impute_mach = machine(final_imputer, X_train) |> fit!
-	final_X_train = MLJ.transform(impute_mach, X_train)
-	final_X_valid = MLJ.transform(impute_mach, X_valid)
+	println("MAE from Approach 1 (Drop categorical variables):")
+	println(score_dataset(drop_X_train, drop_X_valid, y_train, y_valid))
+end
+
+# ╔═╡ b5189c69-81cf-4835-aad4-f9b4ee8eedbf
+begin
+	println("Unique values in 'Condition2' column in training data:", unique(X_train.Condition2))
+	println("\nUnique values in 'Condition2' column in validation data:", unique(X_valid.Condition2))
+end
+
+# ╔═╡ ae5b8597-9b3b-4cc5-bef3-debd1c61c911
+md"""
+## converting data in categorical
+"""
+
+# ╔═╡ 4c0014a9-c986-456b-b1cc-63f7bc9145fc
+
+
+# ╔═╡ c8e24819-1fae-429b-8eeb-7dc781741b07
+begin
+	coerce!(X_train, autotype(X_train))
+	coerce!(X_valid, autotype(X_valid))
 end;
 
-# ╔═╡ c5db0058-3f08-4962-b9c5-ee5c2d7b35f0
+# ╔═╡ ae21231b-dfff-41e5-b816-423e53aaf067
+schema(X_train) |> DataFrame
+
+# ╔═╡ f35d0799-0491-41e0-9172-be3a9e46f409
+describe(X_train)
+
+# ╔═╡ 28c0897a-4f1e-48d1-bb30-3d2de9f84abb
+schema(X_valid) |> DataFrame
+
+# ╔═╡ 0f1e48e9-6673-48c3-8ccd-d07721c9b989
 begin
-	Forest = @load RandomForestRegressor pkg=DecisionTree verbosity=0
-	forest = Forest(n_trees=100, rng=0)
-	final_mach = machine(forest, final_X_train, y_train, scitype_check_level=0) |> fit!
-	# Get validation predictions and MAE
-	preds_valid = predict(final_mach, final_X_valid)
-	println("MAE (Your approach):")
-	println(mean_absolute_error(preds_valid, y_valid))
+	# Categorical columns in the training data
+	object_cols = [col for col in names(X_train) if eltype(X_train[!, col]) <: CategoricalValue]
+	# Columns that can be safely ordinal encoded
+	good_label_cols = [col for col in object_cols if 
+	                   issubset(Set(X_valid[!, col]), Set(X_train[!, col]))]
+	# Problematic columns that will be dropped from the dataset
+	bad_label_cols = (setdiff(object_cols, good_label_cols))
+	println("Categorical columns that will be ordinal encoded: ", good_label_cols)
+	println("\nCategorical columns that will be dropped from the dataset: ", bad_label_cols)
 end
 
-# ╔═╡ f76b9828-168d-4761-b21d-9f7b6091ddac
+# ╔═╡ 6d871e4c-eb16-4943-939a-d081b9a3d0dc
+size(object_cols), size(good_label_cols)
+
+# ╔═╡ 4ab08df3-87f6-4bcb-bbef-f08bfd5e192d
+# Drop categorical columns that will not be encoded
+label_X_train = X_train[:, Not(bad_label_cols)];
+
+# ╔═╡ f15ba9b6-0629-42b7-86cd-0cfdf466c02c
+label_X_valid = X_valid[:,Not(bad_label_cols)];
+
+# ╔═╡ c85ca4fe-989c-4f7c-869a-7096b25b56b6
+# Apply ordinal encoder 
+ordinal_encoder = OrdinalEncoder() # using BetaML
+
+# ╔═╡ 891ec3c9-647f-4ac6-96e8-63e4bb5eace1
+for col in good_label_cols
+	label_X_train[!, col] = BetaML.fit!(ordinal_encoder, X_train[!, col])
+	label_X_valid[!, col] = BetaML.fit!(ordinal_encoder, X_valid[!, col])
+end
+
+# ╔═╡ 96acb7d6-10b6-465d-8a31-f536149446db
+vcat(first(label_X_train, 5), first(label_X_valid, 5))
+
+# ╔═╡ c35dbfc6-66b6-47a1-b995-f0e5395073d4
+begin
+	println("MAE from Approach 2 (Ordinal Encoding):") 
+	println(score_dataset(label_X_train, label_X_valid, y_train, y_valid))
+end
+
+# ╔═╡ b4699ad0-1698-4695-bdba-598b7ac02197
+unique(X_train.Neighborhood) |> length 
+
+# ╔═╡ f26891ab-7722-4bc8-aa20-c0c3c58ef26d
+unique(X_train.Street)
+
+# ╔═╡ 854a80af-b7b0-41a2-9c75-fc613e908ef5
+md"## One-hot encoding"
+
+# ╔═╡ ce72749b-7ab5-45af-b95e-00bfa0359c68
+# Columns that will be one-hot encoded
+low_cardinality_cols = [col for col in object_cols if length(unique(X_train[:,col])) < 10]
+
+# ╔═╡ 3bff7c77-f93d-485e-886a-53295664879e
+# Columns that will be dropped from the dataset
+high_cardinality_cols = (setdiff(object_cols, low_cardinality_cols))
+
+# ╔═╡ 4e08b65e-f1fa-43e8-ace1-8fa9ed87c286
+good_label_cols_1 = [col for col in low_cardinality_cols if 
+	                   issubset(Set(X_valid[!, col]), Set(X_train[!, col]))]
+
+# ╔═╡ eb6dd51b-edc4-4183-90c3-3cb162b8c214
+println("Categorical columns that will be one-hot encoded:", low_cardinality_cols)
+
+# ╔═╡ 4975e927-9cd8-452d-8269-34c4230df8b3
+println("\nCategorical columns that will be dropped from the dataset:", high_cardinality_cols)
+
+# ╔═╡ 172519c9-60d2-425f-812e-436920977915
+OH_Encoder = MLJ.OneHotEncoder()
+
+# ╔═╡ cebc7656-bfb1-4147-b25a-0ed98fa53685
+# Apply one-hot encoder to each column with categorical data
+machlow = MLJ.fit!(machine(OH_Encoder, X_train[:, low_cardinality_cols]), verbosity=0)
+
+# ╔═╡ 74a6206e-c10a-4a5e-aae5-7162a97820ef
+OH_cols_train = MLJ.transform(machlow, X_train[:,low_cardinality_cols])
+
+# ╔═╡ 77d2ef21-6eda-4e8f-b89a-c340763d9fdb
 md"""
-## Part B
+begin
+	levels!(X_valid.Utilities, levels(X_train.Utilities))
+	levels!(X_valid.Condition1, levels(X_train.Condition1))
+	levels!(X_valid.Condition2, levels(X_train.Condition2))
+	levels!(X_valid.OverallCond, levels(X_train.OverallCond))
+	levels!(X_valid.RoofStyle, levels(X_train.RoofStyle))
+	levels!(X_valid.RoofMatl, levels(X_train.RoofMatl))
+	levels!(X_valid.ExterCond, levels(X_train.ExterCond))
+	levels!(X_valid.Foundation, levels(X_train.Foundation))
+	levels!(X_valid.Heating, levels(X_train.Heating))
+	levels!(X_valid.HeatingQC, levels(X_train.HeatingQC))
+end
 """
 
-# ╔═╡ aa9ed3ed-a150-46bf-ab07-d58e7af36bab
-final_X_test = MLJ.transform(impute_mach, X_test)
+# ╔═╡ 4d05b243-9c05-4f6a-bf53-54de938e4f55
+OH_cols_valid = MLJ.transform(machlow, X_valid[:,low_cardinality_cols])
 
-# ╔═╡ 7436201b-dfd6-47a3-8358-7ced2eb83f1d
-# Fill in the line below: get test predictions
-preds_test = predict(final_mach, final_X_test)
+# ╔═╡ 60e978c2-07c4-4f71-b4c6-4b27cef07264
+unique(X_train.Utilities), unique(X_valid.Utilities)
 
-# ╔═╡ 55ca2be3-2669-42fa-b33d-024a711c92b1
-begin
-	output = DataFrame("Id" => X_test.Id,
-	                       "SalePrice" => preds_test)
-	CSV.write("data\\home-data-for-ml-course\\submissions_02x02.csv", output)
-end
+# ╔═╡ 75847092-838d-4dc0-a8a4-4bbc248c6f7e
+X_train.HeatingQC[29]
+
+# ╔═╡ 7a9668dd-eca6-4799-9eb2-7c40d243ec6c
+X_valid.HeatingQC[29]
+
+# ╔═╡ 4b540dbb-d45a-49be-9c46-880ff821f03f
+# One-hot encoding removed index; put it back
+OH_cols_train.Id = X_train.Id;
+
+# ╔═╡ 1b467289-388b-4513-8ceb-643e28baeb05
+OH_cols_valid.Id = X_valid.Id
+
+# ╔═╡ 6453a198-5084-4304-90e9-cab5fbb7d8bb
+# Remove categorical columns (will replace with one-hot encoding)
+num_X_train = X_train.drop(object_cols, axis=1)
+
+# ╔═╡ db7fe782-2cab-4f41-a31d-cff592584a70
+num_X_valid = X_valid.drop(object_cols, axis=1)
+
+# ╔═╡ c54a6239-b596-4a4c-b795-7bed252d721e
+# Add one-hot encoded columns to numerical features
+OH_X_train = concat([num_X_train, OH_cols_train], axis=1)
+
+# ╔═╡ 2141ae31-f501-4db3-af22-bf8f6ba21d5c
+OH_X_valid = concat([num_X_valid, OH_cols_valid], axis=1)
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
 [deps]
+BetaML = "024491cd-cc6b-443e-8034-08ea7eb7db2b"
 CSV = "336ed68f-0bac-5ca0-87d4-7b16caf5d00b"
+CategoricalArrays = "324d7699-5711-5eae-9e2f-1d82baa6b597"
 DataFrames = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"
 MLJ = "add582a8-e3ab-11e8-2d5e-e98b27df1bc7"
 MLJDecisionTreeInterface = "c6f25543-311c-4c74-83dc-3ea6d1015661"
+
+[compat]
+BetaML = "~0.9.6"
+CSV = "~0.10.9"
+CategoricalArrays = "~0.10.7"
+DataFrames = "~1.5.0"
+MLJ = "~0.19.1"
+MLJDecisionTreeInterface = "~0.4.0"
 """
 
 # ╔═╡ 00000000-0000-0000-0000-000000000002
@@ -202,7 +299,7 @@ PLUTO_MANIFEST_TOML_CONTENTS = """
 
 julia_version = "1.9.0-rc1"
 manifest_format = "2.0"
-project_hash = "271265e81886a905eb66d74f3d42fd33f2240359"
+project_hash = "0270c79b0e927ec57cfea74138cf1464b2312cb5"
 
 [[deps.ARFFFiles]]
 deps = ["CategoricalArrays", "Dates", "Parsers", "Tables"]
@@ -210,14 +307,62 @@ git-tree-sha1 = "e8c8e0a2be6eb4f56b1672e46004463033daa409"
 uuid = "da404889-ca92-49ff-9e8b-0aa6b4d38dc8"
 version = "1.4.1"
 
+[[deps.AbstractFFTs]]
+deps = ["LinearAlgebra"]
+git-tree-sha1 = "16b6dbc4cf7caee4e1e75c49485ec67b667098a0"
+uuid = "621f4979-c628-5d54-868e-fcf4e3e8185c"
+version = "1.3.1"
+weakdeps = ["ChainRulesCore"]
+
+    [deps.AbstractFFTs.extensions]
+    AbstractFFTsChainRulesCoreExt = "ChainRulesCore"
+
 [[deps.AbstractTrees]]
 git-tree-sha1 = "faa260e4cb5aba097a73fab382dd4b5819d8ec8c"
 uuid = "1520ce14-60c1-5f80-bbc7-55ef81b5835c"
 version = "0.4.4"
 
+[[deps.Adapt]]
+deps = ["LinearAlgebra", "Requires"]
+git-tree-sha1 = "cc37d689f599e8df4f464b2fa3870ff7db7492ef"
+uuid = "79e6a3ab-5dfb-504d-930d-738a2a938a0e"
+version = "3.6.1"
+weakdeps = ["StaticArrays"]
+
+    [deps.Adapt.extensions]
+    AdaptStaticArraysExt = "StaticArrays"
+
 [[deps.ArgTools]]
 uuid = "0dad84c5-d112-42e6-8d28-ef12dabb789f"
 version = "1.1.1"
+
+[[deps.ArrayInterface]]
+deps = ["Adapt", "LinearAlgebra", "Requires", "SnoopPrecompile", "SparseArrays", "SuiteSparse"]
+git-tree-sha1 = "a89acc90c551067cd84119ff018619a1a76c6277"
+uuid = "4fba245c-0d91-5ea0-9b3e-6abc04ee57a9"
+version = "7.2.1"
+
+    [deps.ArrayInterface.extensions]
+    ArrayInterfaceBandedMatricesExt = "BandedMatrices"
+    ArrayInterfaceBlockBandedMatricesExt = "BlockBandedMatrices"
+    ArrayInterfaceCUDAExt = "CUDA"
+    ArrayInterfaceGPUArraysCoreExt = "GPUArraysCore"
+    ArrayInterfaceStaticArraysCoreExt = "StaticArraysCore"
+    ArrayInterfaceTrackerExt = "Tracker"
+
+    [deps.ArrayInterface.weakdeps]
+    BandedMatrices = "aae01518-5342-5314-be14-df237901396f"
+    BlockBandedMatrices = "ffab5731-97b5-5995-9138-79e8c1846df0"
+    CUDA = "052768ef-5323-5732-b1bb-66c8b64840ba"
+    GPUArraysCore = "46192b85-c4d5-4398-a991-12ede77f4527"
+    StaticArraysCore = "1e83bf80-4336-4d27-bf5d-d5a4f845583c"
+    Tracker = "9f7883ad-71c0-57eb-9f7f-b5c9e6d3789c"
+
+[[deps.ArrayInterfaceCore]]
+deps = ["LinearAlgebra", "SnoopPrecompile", "SparseArrays", "SuiteSparse"]
+git-tree-sha1 = "e5f08b5689b1aad068e01751889f2f615c7db36d"
+uuid = "30b0a656-2188-435a-8636-2ec0e6a096e2"
+version = "0.1.29"
 
 [[deps.Artifacts]]
 uuid = "56f22d72-fd6d-98f1-02f0-08ddc0907c33"
@@ -225,10 +370,33 @@ uuid = "56f22d72-fd6d-98f1-02f0-08ddc0907c33"
 [[deps.Base64]]
 uuid = "2a0f44e3-6c83-55bd-87e4-b1978d98bd5f"
 
+[[deps.BetaML]]
+deps = ["AbstractTrees", "CategoricalArrays", "Combinatorics", "DelimitedFiles", "Distributions", "DocStringExtensions", "ForceImport", "JLD2", "LinearAlgebra", "LoopVectorization", "MLJModelInterface", "PDMats", "Printf", "ProgressMeter", "Random", "Reexport", "StableRNGs", "StaticArrays", "Statistics", "Test", "Zygote"]
+git-tree-sha1 = "151d340275c02bb9754cdb66f576fe4d856c2405"
+uuid = "024491cd-cc6b-443e-8034-08ea7eb7db2b"
+version = "0.9.6"
+
 [[deps.BitFlags]]
 git-tree-sha1 = "43b1a4a8f797c1cddadf60499a8a077d4af2cd2d"
 uuid = "d1d4a3ce-64b1-5f1a-9ba4-7e7e69966f35"
 version = "0.1.7"
+
+[[deps.BitTwiddlingConvenienceFunctions]]
+deps = ["Static"]
+git-tree-sha1 = "0c5f81f47bbbcf4aea7b2959135713459170798b"
+uuid = "62783981-4cbd-42fc-bca8-16325de8dc4b"
+version = "0.1.5"
+
+[[deps.CEnum]]
+git-tree-sha1 = "eb4cb44a499229b3b8426dcfb5dd85333951ff90"
+uuid = "fa961155-64e5-5f13-b03f-caf6b980ea82"
+version = "0.4.2"
+
+[[deps.CPUSummary]]
+deps = ["CpuId", "IfElse", "Static"]
+git-tree-sha1 = "2c144ddb46b552f72d7eafe7cc2f50746e41ea21"
+uuid = "2a0fbf3d-bb9c-48f3-b0a9-814d99fd7ab9"
+version = "0.2.2"
 
 [[deps.CSV]]
 deps = ["CodecZlib", "Dates", "FilePathsBase", "InlineStrings", "Mmap", "Parsers", "PooledArrays", "SentinelArrays", "SnoopPrecompile", "Tables", "Unicode", "WeakRefStrings", "WorkerUtilities"]
@@ -260,6 +428,24 @@ version = "0.1.10"
     [deps.CategoricalDistributions.weakdeps]
     UnicodePlots = "b8865327-cd53-5732-bb35-84acbb429228"
 
+[[deps.ChainRules]]
+deps = ["Adapt", "ChainRulesCore", "Compat", "Distributed", "GPUArraysCore", "IrrationalConstants", "LinearAlgebra", "Random", "RealDot", "SparseArrays", "Statistics", "StructArrays"]
+git-tree-sha1 = "7d20c2fb8ab838e41069398685e7b6b5f89ed85b"
+uuid = "082447d4-558c-5d27-93f4-14fc19e9eca2"
+version = "1.48.0"
+
+[[deps.ChainRulesCore]]
+deps = ["Compat", "LinearAlgebra", "SparseArrays"]
+git-tree-sha1 = "c6d890a52d2c4d55d326439580c3b8d0875a77d9"
+uuid = "d360d2e6-b24c-11e9-a2a3-2a2ae2dbcce4"
+version = "1.15.7"
+
+[[deps.CloseOpenIntervals]]
+deps = ["Static", "StaticArrayInterface"]
+git-tree-sha1 = "70232f82ffaab9dc52585e0dd043b5e0c6b714f1"
+uuid = "fb6a15b2-703c-40df-9091-08a04967cfa9"
+version = "0.1.12"
+
 [[deps.CodecZlib]]
 deps = ["TranscodingStreams", "Zlib_jll"]
 git-tree-sha1 = "9c209fb7536406834aa938fb149964b985de6c83"
@@ -276,6 +462,12 @@ version = "0.11.4"
 git-tree-sha1 = "08c8b6831dc00bfea825826be0bc8336fc369860"
 uuid = "861a8166-3701-5b0c-9a16-15d98fcdc6aa"
 version = "1.0.2"
+
+[[deps.CommonSubexpressions]]
+deps = ["MacroTools", "Test"]
+git-tree-sha1 = "7b8a93dba8af7e3b42fecabf646260105ac373f7"
+uuid = "bbf7d656-a473-5ed7-a52c-81e309532950"
+version = "0.3.0"
 
 [[deps.Compat]]
 deps = ["UUIDs"]
@@ -296,6 +488,12 @@ version = "1.0.2+0"
 git-tree-sha1 = "52cb3ec90e8a8bea0e62e275ba577ad0f74821f7"
 uuid = "ed09eef8-17a6-5b46-8889-db040fac31e3"
 version = "0.3.2"
+
+[[deps.CpuId]]
+deps = ["Markdown"]
+git-tree-sha1 = "fcbb72b032692610bfbdb15018ac16a36cf2e406"
+uuid = "adafc99b-e345-5852-983c-f28acb93d879"
+version = "0.3.1"
 
 [[deps.Crayons]]
 git-tree-sha1 = "249fe38abf76d48563e2f4556bebd215aa317e15"
@@ -339,6 +537,18 @@ deps = ["Mmap"]
 git-tree-sha1 = "9e2f36d3c96a820c678f2f1f1782582fcf685bae"
 uuid = "8bb1440f-4735-579b-a4ab-409b98df4dab"
 version = "1.9.1"
+
+[[deps.DiffResults]]
+deps = ["StaticArraysCore"]
+git-tree-sha1 = "782dd5f4561f5d267313f23853baaaa4c52ea621"
+uuid = "163ba53b-c6d8-5494-b064-1a9d43ac40c5"
+version = "1.1.0"
+
+[[deps.DiffRules]]
+deps = ["IrrationalConstants", "LogExpFunctions", "NaNMath", "Random", "SpecialFunctions"]
+git-tree-sha1 = "a4ad7ef19d2cdc2eff57abbbe68032b1cd0bd8f8"
+uuid = "b552c78f-8df3-52c6-915a-8e097449b14b"
+version = "1.13.0"
 
 [[deps.Distances]]
 deps = ["LinearAlgebra", "SparseArrays", "Statistics", "StatsAPI"]
@@ -387,6 +597,12 @@ git-tree-sha1 = "98fdf08b707aaf69f524a6cd0a67858cefe0cfb6"
 uuid = "792122b4-ca99-40de-a6bc-6742525f08b6"
 version = "0.3.0"
 
+[[deps.FileIO]]
+deps = ["Pkg", "Requires", "UUIDs"]
+git-tree-sha1 = "7be5f99f7d15578798f338f5433b6c432ea8037b"
+uuid = "5789e2e9-d7fb-5bc7-8068-2c6fae9b9549"
+version = "1.16.0"
+
 [[deps.FilePathsBase]]
 deps = ["Compat", "Dates", "Mmap", "Printf", "Test", "UUIDs"]
 git-tree-sha1 = "e27c4ebe80e8699540f2d6c805cc12203b614f12"
@@ -408,15 +624,43 @@ git-tree-sha1 = "335bfdceacc84c5cdf16aadc768aa5ddfc5383cc"
 uuid = "53c48c17-4a7d-5ca2-90c5-79b7896eea93"
 version = "0.8.4"
 
+[[deps.ForceImport]]
+deps = ["Test"]
+git-tree-sha1 = "7ac07d5194360af910146abd33af89bb69541194"
+uuid = "9dda63f9-cce7-5873-89fa-eccbb2fffcde"
+version = "0.0.3"
+
 [[deps.Formatting]]
 deps = ["Printf"]
 git-tree-sha1 = "8339d61043228fdd3eb658d86c926cb282ae72a8"
 uuid = "59287772-0a20-5a39-b81b-1366585eb4c0"
 version = "0.4.2"
 
+[[deps.ForwardDiff]]
+deps = ["CommonSubexpressions", "DiffResults", "DiffRules", "LinearAlgebra", "LogExpFunctions", "NaNMath", "Preferences", "Printf", "Random", "SpecialFunctions"]
+git-tree-sha1 = "00e252f4d706b3d55a8863432e742bf5717b498d"
+uuid = "f6369f11-7733-5829-9624-2563aa707210"
+version = "0.10.35"
+weakdeps = ["StaticArrays"]
+
+    [deps.ForwardDiff.extensions]
+    ForwardDiffStaticArraysExt = "StaticArrays"
+
 [[deps.Future]]
 deps = ["Random"]
 uuid = "9fa8497b-333b-5362-9e8d-4d0656e87820"
+
+[[deps.GPUArrays]]
+deps = ["Adapt", "GPUArraysCore", "LLVM", "LinearAlgebra", "Printf", "Random", "Reexport", "Serialization", "Statistics"]
+git-tree-sha1 = "a28f752ffab0ccd6660fc7af5ad1c9ad176f45f7"
+uuid = "0c68f7d7-f131-5f86-a1c3-88cf8149b2d7"
+version = "8.6.3"
+
+[[deps.GPUArraysCore]]
+deps = ["Adapt"]
+git-tree-sha1 = "1cd7f0af1aa58abc02ea1d872953a97359cb87fa"
+uuid = "46192b85-c4d5-4398-a991-12ede77f4527"
+version = "0.1.4"
 
 [[deps.HTTP]]
 deps = ["Base64", "CodecZlib", "Dates", "IniFile", "Logging", "LoggingExtras", "MbedTLS", "NetworkOptions", "OpenSSL", "Random", "SimpleBufferStream", "Sockets", "URIs", "UUIDs"]
@@ -424,11 +668,28 @@ git-tree-sha1 = "37e4657cd56b11abe3d10cd4a1ec5fbdb4180263"
 uuid = "cd3eb016-35fb-5094-929b-558a96fad6f3"
 version = "1.7.4"
 
+[[deps.HostCPUFeatures]]
+deps = ["BitTwiddlingConvenienceFunctions", "IfElse", "Libdl", "Static"]
+git-tree-sha1 = "734fd90dd2f920a2f1921d5388dcebe805b262dc"
+uuid = "3e5b6fbb-0976-4d2c-9146-d79de83f2fb0"
+version = "0.1.14"
+
 [[deps.HypergeometricFunctions]]
 deps = ["DualNumbers", "LinearAlgebra", "OpenLibm_jll", "SpecialFunctions", "Test"]
 git-tree-sha1 = "709d864e3ed6e3545230601f94e11ebc65994641"
 uuid = "34004b35-14d8-5ef3-9330-4cdb6864b03a"
 version = "0.3.11"
+
+[[deps.IRTools]]
+deps = ["InteractiveUtils", "MacroTools", "Test"]
+git-tree-sha1 = "2af2fe19f0d5799311a6491267a14817ad9fbd20"
+uuid = "7869d1d1-7146-5819-86e3-90919afe41df"
+version = "0.4.8"
+
+[[deps.IfElse]]
+git-tree-sha1 = "debdd00ffef04665ccbb3e150747a77560e8fad1"
+uuid = "615f187c-cbe4-4ef1-ba3b-2fcf58d6d173"
+version = "0.1.1"
 
 [[deps.IniFile]]
 git-tree-sha1 = "f550e6e32074c939295eb5ea6de31849ac2c9625"
@@ -466,6 +727,12 @@ git-tree-sha1 = "a3f24677c21f5bbe9d2a714f95dcd58337fb2856"
 uuid = "82899510-4779-5014-852e-03e436cf321d"
 version = "1.0.0"
 
+[[deps.JLD2]]
+deps = ["FileIO", "MacroTools", "Mmap", "OrderedCollections", "Pkg", "Printf", "Reexport", "Requires", "TranscodingStreams", "UUIDs"]
+git-tree-sha1 = "42c17b18ced77ff0be65957a591d34f4ed57c631"
+uuid = "033835bb-8acc-5ee8-8aae-3f567f8a3819"
+version = "0.4.31"
+
 [[deps.JLLWrappers]]
 deps = ["Preferences"]
 git-tree-sha1 = "abc9885a7ca2052a736a600f7fa66209f96506e1"
@@ -478,6 +745,18 @@ git-tree-sha1 = "3c837543ddb02250ef42f4738347454f95079d4e"
 uuid = "682c06a0-de6a-54ab-a142-c8b1cf79cde6"
 version = "0.21.3"
 
+[[deps.LLVM]]
+deps = ["CEnum", "LLVMExtra_jll", "Libdl", "Printf", "Unicode"]
+git-tree-sha1 = "df115c31f5c163697eede495918d8e85045c8f04"
+uuid = "929cbde3-209d-540e-8aea-75f648917ca0"
+version = "4.16.0"
+
+[[deps.LLVMExtra_jll]]
+deps = ["Artifacts", "JLLWrappers", "LazyArtifacts", "Libdl", "Pkg", "TOML"]
+git-tree-sha1 = "7718cf44439c676bc0ec66a87099f41015a522d6"
+uuid = "dad2f222-ce93-54a1-a47d-0025e8a3acab"
+version = "0.0.16+2"
+
 [[deps.LaTeXStrings]]
 git-tree-sha1 = "f2355693d6778a178ade15952b7ac47a4ff97996"
 uuid = "b964fa9f-0449-5b57-a5c2-d3ea65f4040f"
@@ -488,6 +767,16 @@ deps = ["Random", "StableRNGs", "StatsBase", "Test"]
 git-tree-sha1 = "42938ab65e9ed3c3029a8d2c58382ca75bdab243"
 uuid = "a5e1c1ea-c99a-51d3-a14d-a9a37257b02d"
 version = "1.8.0"
+
+[[deps.LayoutPointers]]
+deps = ["ArrayInterface", "LinearAlgebra", "ManualMemory", "SIMDTypes", "Static", "StaticArrayInterface"]
+git-tree-sha1 = "88b8f66b604da079a627b6fb2860d3704a6729a1"
+uuid = "10f19ff3-798f-405d-979b-55457f8fc047"
+version = "0.1.14"
+
+[[deps.LazyArtifacts]]
+deps = ["Artifacts", "Pkg"]
+uuid = "4af54fe1-eca0-43a8-85a7-787d91b784e3"
 
 [[deps.LibCURL]]
 deps = ["LibCURL_jll", "MozillaCACerts_jll"]
@@ -539,6 +828,17 @@ deps = ["Dates", "Logging"]
 git-tree-sha1 = "cedb76b37bc5a6c702ade66be44f831fa23c681e"
 uuid = "e6f89c97-d47a-5376-807f-9c37f3926c36"
 version = "1.0.0"
+
+[[deps.LoopVectorization]]
+deps = ["ArrayInterface", "ArrayInterfaceCore", "CPUSummary", "CloseOpenIntervals", "DocStringExtensions", "HostCPUFeatures", "IfElse", "LayoutPointers", "LinearAlgebra", "OffsetArrays", "PolyesterWeave", "SIMDTypes", "SLEEFPirates", "SnoopPrecompile", "Static", "StaticArrayInterface", "ThreadingUtilities", "UnPack", "VectorizationBase"]
+git-tree-sha1 = "2acf6874142d05d5d1ad49e8d3786b8cd800936d"
+uuid = "bdcacae8-1622-11e9-2a5c-532679323890"
+version = "0.12.152"
+weakdeps = ["ChainRulesCore", "ForwardDiff", "SpecialFunctions"]
+
+    [deps.LoopVectorization.extensions]
+    ForwardDiffExt = ["ChainRulesCore", "ForwardDiff"]
+    SpecialFunctionsExt = "SpecialFunctions"
 
 [[deps.LossFunctions]]
 deps = ["InteractiveUtils", "Markdown", "RecipesBase"]
@@ -594,6 +894,17 @@ git-tree-sha1 = "02688098bd77827b64ed8ad747c14f715f98cfc4"
 uuid = "03970b2e-30c4-11ea-3135-d1576263f10f"
 version = "0.7.4"
 
+[[deps.MacroTools]]
+deps = ["Markdown", "Random"]
+git-tree-sha1 = "42324d08725e200c23d4dfb549e0d5d89dede2d2"
+uuid = "1914dd2f-81c6-5fcd-8719-6d5c9610ff09"
+version = "0.5.10"
+
+[[deps.ManualMemory]]
+git-tree-sha1 = "bcaef4fc7a0cfe2cba636d84cda54b5e4e4ca3cd"
+uuid = "d125e4d3-2237-4719-b19c-fa641b8a4667"
+version = "0.1.8"
+
 [[deps.Markdown]]
 deps = ["Base64"]
 uuid = "d6f4376e-aef5-505a-96c1-9c027394607a"
@@ -631,6 +942,12 @@ version = "1.0.2"
 [[deps.NetworkOptions]]
 uuid = "ca575930-c2e3-43a9-ace4-1e988b2c1908"
 version = "1.2.0"
+
+[[deps.OffsetArrays]]
+deps = ["Adapt"]
+git-tree-sha1 = "82d7c9e310fe55aa54996e6f7f94674e2a38fcb4"
+uuid = "6fe1bfb0-de20-5000-8ca7-80f57d26f881"
+version = "1.12.9"
 
 [[deps.OpenBLAS_jll]]
 deps = ["Artifacts", "CompilerSupportLibraries_jll", "Libdl"]
@@ -694,6 +1011,12 @@ deps = ["Artifacts", "Dates", "Downloads", "FileWatching", "LibGit2", "Libdl", "
 uuid = "44cfe95a-1eb2-52ea-b672-e2afdf69b78f"
 version = "1.9.0"
 
+[[deps.PolyesterWeave]]
+deps = ["BitTwiddlingConvenienceFunctions", "CPUSummary", "IfElse", "Static", "ThreadingUtilities"]
+git-tree-sha1 = "240d7170f5ffdb285f9427b92333c3463bf65bf6"
+uuid = "1d0040c9-8b98-4ee7-8388-3f51789ca0ad"
+version = "0.2.1"
+
 [[deps.PooledArrays]]
 deps = ["DataAPI", "Future"]
 git-tree-sha1 = "a6062fe4063cdafe78f4a0a81cfffb89721b30e7"
@@ -741,6 +1064,12 @@ uuid = "3fa0cd96-eef1-5676-8a61-b3b8758bbffb"
 deps = ["SHA", "Serialization"]
 uuid = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
 
+[[deps.RealDot]]
+deps = ["LinearAlgebra"]
+git-tree-sha1 = "9f0a1b71baaf7650f4fa8a1d168c7fb6ee41f0c9"
+uuid = "c1ae055f-0cd5-4b69-90a6-9a35b1a98df9"
+version = "0.1.0"
+
 [[deps.RecipesBase]]
 deps = ["SnoopPrecompile"]
 git-tree-sha1 = "261dddd3b862bd2c940cf6ca4d1c8fe593e457c8"
@@ -779,6 +1108,17 @@ version = "0.4.0+0"
 [[deps.SHA]]
 uuid = "ea8e919c-243c-51af-8825-aaa63cd721ce"
 version = "0.7.0"
+
+[[deps.SIMDTypes]]
+git-tree-sha1 = "330289636fb8107c5f32088d2741e9fd7a061a5c"
+uuid = "94e857df-77ce-4151-89e5-788b33177be4"
+version = "0.1.0"
+
+[[deps.SLEEFPirates]]
+deps = ["IfElse", "Static", "VectorizationBase"]
+git-tree-sha1 = "cda0aece8080e992f6370491b08ef3909d1c04e7"
+uuid = "476501e8-09a2-5ece-8869-fb82de89a1fa"
+version = "0.6.38"
 
 [[deps.ScientificTypes]]
 deps = ["CategoricalArrays", "ColorTypes", "Dates", "Distributions", "PrettyTables", "Reexport", "ScientificTypesBase", "StatisticalTraits", "Tables"]
@@ -841,18 +1181,44 @@ deps = ["IrrationalConstants", "LogExpFunctions", "OpenLibm_jll", "OpenSpecFun_j
 git-tree-sha1 = "ef28127915f4229c971eb43f3fc075dd3fe91880"
 uuid = "276daf66-3868-5448-9aa4-cd146d93841b"
 version = "2.2.0"
+weakdeps = ["ChainRulesCore"]
 
     [deps.SpecialFunctions.extensions]
     SpecialFunctionsChainRulesCoreExt = "ChainRulesCore"
-
-    [deps.SpecialFunctions.weakdeps]
-    ChainRulesCore = "d360d2e6-b24c-11e9-a2a3-2a2ae2dbcce4"
 
 [[deps.StableRNGs]]
 deps = ["Random", "Test"]
 git-tree-sha1 = "3be7d49667040add7ee151fefaf1f8c04c8c8276"
 uuid = "860ef19b-820b-49d6-a774-d7a799459cd3"
 version = "1.0.0"
+
+[[deps.Static]]
+deps = ["IfElse"]
+git-tree-sha1 = "d0435ba43ab5ad1cbb5f0d286ca4ba67029ed3ee"
+uuid = "aedffcd0-7271-4cad-89d0-dc628f76c6d3"
+version = "0.8.4"
+
+[[deps.StaticArrayInterface]]
+deps = ["ArrayInterface", "Compat", "IfElse", "LinearAlgebra", "Requires", "SnoopPrecompile", "SparseArrays", "Static", "SuiteSparse"]
+git-tree-sha1 = "fd5f417fd7e103c121b0a0b4a6902f03991111f4"
+uuid = "0d7ed370-da01-4f52-bd93-41d350b8b718"
+version = "1.3.0"
+weakdeps = ["OffsetArrays", "StaticArrays"]
+
+    [deps.StaticArrayInterface.extensions]
+    StaticArrayInterfaceOffsetArraysExt = "OffsetArrays"
+    StaticArrayInterfaceStaticArraysExt = "StaticArrays"
+
+[[deps.StaticArrays]]
+deps = ["LinearAlgebra", "Random", "StaticArraysCore", "Statistics"]
+git-tree-sha1 = "2d7d9e1ddadc8407ffd460e24218e37ef52dd9a3"
+uuid = "90137ffa-7385-5640-81b9-e52037218182"
+version = "1.5.16"
+
+[[deps.StaticArraysCore]]
+git-tree-sha1 = "6b7ba252635a5eff6a0b0664a41ee140a1c9e72a"
+uuid = "1e83bf80-4336-4d27-bf5d-d5a4f845583c"
+version = "1.4.0"
 
 [[deps.StatisticalTraits]]
 deps = ["ScientificTypesBase"]
@@ -896,6 +1262,12 @@ git-tree-sha1 = "46da2434b41f41ac3594ee9816ce5541c6096123"
 uuid = "892a3eda-7b42-436c-8928-eab12a02cf0e"
 version = "0.3.0"
 
+[[deps.StructArrays]]
+deps = ["Adapt", "DataAPI", "GPUArraysCore", "StaticArraysCore", "Tables"]
+git-tree-sha1 = "b03a3b745aa49b566f128977a7dd1be8711c5e71"
+uuid = "09ab397b-f2b6-538f-b94a-2f83cf4a842a"
+version = "0.6.14"
+
 [[deps.SuiteSparse]]
 deps = ["Libdl", "LinearAlgebra", "Serialization", "SparseArrays"]
 uuid = "4607b0f0-06f3-5cda-b6b1-a6196a1729e9"
@@ -931,6 +1303,12 @@ version = "1.10.0"
 deps = ["InteractiveUtils", "Logging", "Random", "Serialization"]
 uuid = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
+[[deps.ThreadingUtilities]]
+deps = ["ManualMemory"]
+git-tree-sha1 = "c97f60dd4f2331e1a495527f80d242501d2f9865"
+uuid = "8290d209-cae3-49c0-8002-c8c24d57dab5"
+version = "0.5.1"
+
 [[deps.TranscodingStreams]]
 deps = ["Random", "Test"]
 git-tree-sha1 = "94f38103c984f89cf77c402f2a68dbd870f8165f"
@@ -954,6 +1332,12 @@ version = "1.0.2"
 [[deps.Unicode]]
 uuid = "4ec0a83e-493e-50e2-b9ac-8f72acf5a8f5"
 
+[[deps.VectorizationBase]]
+deps = ["ArrayInterface", "CPUSummary", "HostCPUFeatures", "IfElse", "LayoutPointers", "Libdl", "LinearAlgebra", "SIMDTypes", "Static", "StaticArrayInterface"]
+git-tree-sha1 = "a2d69abfc8b9b71a5db110f9757d0cd4a27877c0"
+uuid = "3d5dd08c-fd9d-11e8-17fa-ed2836048c2f"
+version = "0.21.61"
+
 [[deps.WeakRefStrings]]
 deps = ["DataAPI", "InlineStrings", "Parsers"]
 git-tree-sha1 = "b1be2855ed9ed8eac54e5caff2afcdb442d52c23"
@@ -969,6 +1353,18 @@ version = "1.6.1"
 deps = ["Libdl"]
 uuid = "83775a58-1f1d-513f-b197-d71354ab007a"
 version = "1.2.13+0"
+
+[[deps.Zygote]]
+deps = ["AbstractFFTs", "ChainRules", "ChainRulesCore", "DiffRules", "Distributed", "FillArrays", "ForwardDiff", "GPUArrays", "GPUArraysCore", "IRTools", "InteractiveUtils", "LinearAlgebra", "LogExpFunctions", "MacroTools", "NaNMath", "Random", "Requires", "SparseArrays", "SpecialFunctions", "Statistics", "ZygoteRules"]
+git-tree-sha1 = "e1af683167eea952684188f5e1e29b9cabc2e5f9"
+uuid = "e88e6eb3-aa80-5325-afca-941959d7151f"
+version = "0.6.55"
+
+[[deps.ZygoteRules]]
+deps = ["MacroTools"]
+git-tree-sha1 = "8c1a8e4dfacb1fd631745552c8db35d0deb09ea0"
+uuid = "700de1a5-db45-46bc-99cf-38207098b444"
+version = "0.2.2"
 
 [[deps.libblastrampoline_jll]]
 deps = ["Artifacts", "Libdl"]
@@ -987,47 +1383,70 @@ version = "17.4.0+0"
 """
 
 # ╔═╡ Cell order:
-# ╠═862f68ae-b4ce-11ed-2f35-b706fd2c4574
-# ╠═9d6d84c8-2718-42ea-a15e-ca1e2e4410b9
-# ╠═af332b2d-e5df-4f8c-9099-cea12df949e0
-# ╠═ac68a399-9070-48ba-953f-6b9052a88bff
-# ╠═e0f32a33-d78a-480b-8cca-ea9c06b106e7
-# ╠═8dedba60-7f89-47b9-bc74-7ae512ff9b6a
-# ╠═084afa6a-f2d1-49a1-8c0c-becc33a21c95
-# ╟─00f6bb2e-edbd-4f1a-aa56-1e621b7ec88a
-# ╠═c4b828ef-4ad1-4f71-8248-11eca5e8db89
-# ╠═99bb9cac-6bd6-4538-8572-a591813ac5a9
-# ╠═d19a9871-6ddd-4efb-8b13-5c63c0582793
-# ╠═dbe4da80-9cd6-4485-8b20-808f16591fcb
-# ╠═457a12fd-65cc-4c3d-b681-c3d7f96f981a
-# ╠═666567a7-4332-4e1a-95cd-d148c79cadbc
-# ╠═33a1687e-0e33-4395-91b3-3f3e6b0f156a
-# ╠═aad9c4fd-c2b5-4fc6-a5ff-a5f14f30fbd9
-# ╠═2c46c5ca-be1c-4bd1-a330-e8cc3b3ecf5b
-# ╠═232b7e6a-0697-45bf-90ca-337839fa5728
-# ╠═fc7fe2c9-dae1-46e1-aaa9-cc72e8607c9d
-# ╠═56016aea-7244-4945-bdea-315d9c98548b
-# ╠═0a83bb74-ba5e-4a17-b6ad-dd901011b54a
-# ╠═dbfd72f1-3022-4a8a-9b69-a314d8fef6e9
-# ╟─d6fcc16d-be9c-4ea7-9e10-4df65d3111c9
-# ╟─42bc55e8-d002-43db-ab26-c1ac33b9aaa6
-# ╠═1f84e261-b99e-4657-ba2b-f5ba2e882e77
-# ╠═99f2160d-b4e8-49d7-a32d-5ccbbcbe5f80
-# ╠═51412838-9222-4d96-b785-5da995a0d29e
-# ╠═808ce094-a94f-4a46-9ae7-644fef7402c5
-# ╠═52e494e6-29ff-4b15-94e2-7e1ab8f1cd8c
-# ╠═5b7e3df8-498c-4fad-b68d-315863dd62fe
-# ╠═ef94c803-cfea-4ad1-89f7-4600111b8cb6
-# ╠═0da72a72-ee11-4532-ae93-0b298d91eeed
-# ╠═14fe3ec4-3a06-42d7-9d10-a41f2707f7c9
-# ╠═a3a748fe-2e01-4538-8d00-3ad911bcc0c8
-# ╠═bb97b4d4-ce9e-4b0b-9911-2e3ef85691f4
-# ╟─841d97f9-16ce-45d1-8b75-e5feeea3e0ce
-# ╠═b51fd4e7-2db7-4555-8a85-c7aab81fdd00
-# ╠═c5db0058-3f08-4962-b9c5-ee5c2d7b35f0
-# ╟─f76b9828-168d-4761-b21d-9f7b6091ddac
-# ╠═aa9ed3ed-a150-46bf-ab07-d58e7af36bab
-# ╠═7436201b-dfd6-47a3-8358-7ced2eb83f1d
-# ╠═55ca2be3-2669-42fa-b33d-024a711c92b1
+# ╠═0246f270-b5dc-11ed-31b1-57eff55d0c61
+# ╟─0ae4c1ac-b139-41cb-9af4-6cbd209d5f5b
+# ╠═8e560e35-5125-4c54-9dee-339d12588491
+# ╠═4088970c-b4fe-4838-9082-c1ea4a138601
+# ╠═1e45f8e1-d24c-4eb7-aee9-76446af785ae
+# ╟─c4b40c08-34e3-43dd-9cd9-c8f749c5da9c
+# ╠═562c45ae-1536-4fc7-91c7-319662a44236
+# ╟─cdbe92bc-3ce2-4ac4-b4f4-104de649203a
+# ╠═fc106c69-5a31-4f41-b1f8-f89f118c8310
+# ╠═5cd6b7ad-54df-4368-b070-4c1c5c3f1eb5
+# ╠═a7b272d8-5938-4201-890c-e2b3df0f82d2
+# ╟─5876b257-9c74-4b24-ae6f-fac95726569f
+# ╠═a28dea95-9993-4da9-8d7d-c17ce338bca2
+# ╠═da485bba-b442-46a9-8015-9f969cf844a6
+# ╟─75278211-7bb2-4bb1-b976-3b722eeb6c37
+# ╠═562eec95-3b0f-403c-8ca4-2d0a1310a7fc
+# ╠═fe475b62-0bed-430f-8a05-4a912af3f76d
+# ╟─5e34a25b-c0c8-4439-b997-125cbf8b8e31
+# ╠═3dd27220-35c6-4cff-a45c-44ec43998ba1
+# ╠═5ec978ff-1c51-46f6-921d-3c2f2e8da047
+# ╠═a836f6af-b1e4-4cce-9d23-3209efc6b967
+# ╠═6d89b8de-9cd1-4465-bc39-6aa0218776e5
+# ╟─a8c9339c-46cd-4fd2-808b-2db9425fe151
+# ╠═42bbe56a-dda3-4662-a305-77ab47938312
+# ╠═0af40da0-54d5-4688-807e-cac37bc46987
+# ╠═d11cdc8b-5cb0-4b4a-a208-2c3a54fe142b
+# ╠═33cc6295-1998-432d-a289-9aba94b95e12
+# ╠═e1ba8e7e-f967-4b93-918f-13e50727bef1
+# ╠═b5189c69-81cf-4835-aad4-f9b4ee8eedbf
+# ╟─ae5b8597-9b3b-4cc5-bef3-debd1c61c911
+# ╠═4c0014a9-c986-456b-b1cc-63f7bc9145fc
+# ╠═c8e24819-1fae-429b-8eeb-7dc781741b07
+# ╠═ae21231b-dfff-41e5-b816-423e53aaf067
+# ╠═f35d0799-0491-41e0-9172-be3a9e46f409
+# ╠═28c0897a-4f1e-48d1-bb30-3d2de9f84abb
+# ╠═0f1e48e9-6673-48c3-8ccd-d07721c9b989
+# ╠═6d871e4c-eb16-4943-939a-d081b9a3d0dc
+# ╠═4ab08df3-87f6-4bcb-bbef-f08bfd5e192d
+# ╠═f15ba9b6-0629-42b7-86cd-0cfdf466c02c
+# ╠═c85ca4fe-989c-4f7c-869a-7096b25b56b6
+# ╠═891ec3c9-647f-4ac6-96e8-63e4bb5eace1
+# ╠═96acb7d6-10b6-465d-8a31-f536149446db
+# ╠═c35dbfc6-66b6-47a1-b995-f0e5395073d4
+# ╠═b4699ad0-1698-4695-bdba-598b7ac02197
+# ╠═f26891ab-7722-4bc8-aa20-c0c3c58ef26d
+# ╟─854a80af-b7b0-41a2-9c75-fc613e908ef5
+# ╠═ce72749b-7ab5-45af-b95e-00bfa0359c68
+# ╠═3bff7c77-f93d-485e-886a-53295664879e
+# ╠═4e08b65e-f1fa-43e8-ace1-8fa9ed87c286
+# ╠═eb6dd51b-edc4-4183-90c3-3cb162b8c214
+# ╠═4975e927-9cd8-452d-8269-34c4230df8b3
+# ╠═172519c9-60d2-425f-812e-436920977915
+# ╠═cebc7656-bfb1-4147-b25a-0ed98fa53685
+# ╠═74a6206e-c10a-4a5e-aae5-7162a97820ef
+# ╠═77d2ef21-6eda-4e8f-b89a-c340763d9fdb
+# ╠═4d05b243-9c05-4f6a-bf53-54de938e4f55
+# ╠═60e978c2-07c4-4f71-b4c6-4b27cef07264
+# ╠═75847092-838d-4dc0-a8a4-4bbc248c6f7e
+# ╠═7a9668dd-eca6-4799-9eb2-7c40d243ec6c
+# ╠═4b540dbb-d45a-49be-9c46-880ff821f03f
+# ╠═1b467289-388b-4513-8ceb-643e28baeb05
+# ╠═6453a198-5084-4304-90e9-cab5fbb7d8bb
+# ╠═db7fe782-2cab-4f41-a31d-cff592584a70
+# ╠═c54a6239-b596-4a4c-b795-7bed252d721e
+# ╠═2141ae31-f501-4db3-af22-bf8f6ba21d5c
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
