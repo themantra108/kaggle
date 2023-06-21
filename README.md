@@ -1,3 +1,5 @@
+[![Export Pluto notebooks](https://github.com/themantra108/staticPlutoTemplate/actions/workflows/ExportPluto.yaml/badge.svg)](https://github.com/themantra108/staticPlutoTemplate/actions/workflows/ExportPluto.yaml)
+
 # static-export-template
 
 This is a demo repository containing two [Pluto](https://github.com/fonsp/Pluto.jl) notebooks that are **automatically converted to HTML** by a github action, and published to github pages! 🌝
