@@ -12,8 +12,8 @@ using Plots
 
 # ╔═╡ b80b4ad3-f201-4b1a-b96b-8179b9849843
 begin
-	train_data = CSV.read("data\\home-data-for-ml-course\\train.csv", missingstring="NA", DataFrame)
-	test_data = CSV.read("data\\home-data-for-ml-course\\train.csv", missingstring="NA", DataFrame)
+	train_data = CSV.read("data//home-data-for-ml-course//train.csv", missingstring="NA", DataFrame)
+	test_data = CSV.read("data//home-data-for-ml-course//train.csv", missingstring="NA", DataFrame)
 end;
 
 # ╔═╡ c6a7db2e-9f76-4113-973c-cf7a6121ec54

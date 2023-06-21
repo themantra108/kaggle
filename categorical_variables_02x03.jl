@@ -14,8 +14,8 @@ md"""
 
 # ╔═╡ 8e560e35-5125-4c54-9dee-339d12588491
 begin
-	X = CSV.read("data\\home-data-for-ml-course\\train.csv", missingstring="NA", DataFrame)
-	X_test = CSV.read("data\\home-data-for-ml-course\\test.csv", missingstring="NA", DataFrame)
+	X = CSV.read("data//home-data-for-ml-course//train.csv", missingstring="NA", DataFrame)
+	X_test = CSV.read("data//home-data-for-ml-course//test.csv", missingstring="NA", DataFrame)
 end;
 
 # ╔═╡ 4088970c-b4fe-4838-9082-c1ea4a138601

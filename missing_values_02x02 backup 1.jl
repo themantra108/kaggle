@@ -8,10 +8,10 @@ using InteractiveUtils
 using DataFrames, CSV, MLJ, MLJDecisionTreeInterface
 
 # ╔═╡ 9d6d84c8-2718-42ea-a15e-ca1e2e4410b9
-X_full = CSV.read("data\\home-data-for-ml-course\\train.csv", DataFrame);
+X_full = CSV.read("data//home-data-for-ml-course//train.csv", DataFrame);
 
 # ╔═╡ af332b2d-e5df-4f8c-9099-cea12df949e0
-X_test_full = CSV.read("data\\home-data-for-ml-course\\test.csv", DataFrame);
+X_test_full = CSV.read("data//home-data-for-ml-course//test.csv", DataFrame);
 
 # ╔═╡ ac68a399-9070-48ba-953f-6b9052a88bff
 describe(X_full);

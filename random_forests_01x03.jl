@@ -9,7 +9,7 @@ using DataFrames, CSV, MLJ, MLJDecisionTreeInterface
 
 # ╔═╡ 2ca18a68-072b-47aa-814b-66d49eeb3c72
 begin
-	iowa_file_path = "data\\home-data-for-ml-course\\train.csv"
+	iowa_file_path = "data//home-data-for-ml-course//train.csv"
 	home_data = CSV.read(iowa_file_path, DataFrame);
 	y = home_data.SalePrice;
 	feature_names = [:LotArea, :YearBuilt, Symbol("1stFlrSF"), Symbol("2ndFlrSF"), :FullBath, :BedroomAbvGr, :TotRmsAbvGrd];

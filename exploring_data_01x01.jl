@@ -11,7 +11,7 @@ using DataFrames, CSV, MLJ, MLJDecisionTreeInterface
 using Statistics, Dates
 
 # ╔═╡ db8b51cd-e3e5-4ac2-8c39-0b417c788d2c
-iowa_file_path = "data\\home-data-for-ml-course\\train.csv"
+iowa_file_path = "data//home-data-for-ml-course//train.csv"
 
 # ╔═╡ 8fc214c8-b6c0-4974-b3fd-b504c9bee4de
 home_data = CSV.read(iowa_file_path, DataFrame);
