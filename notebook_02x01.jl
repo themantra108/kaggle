@@ -80,7 +80,7 @@ output = DataFrame("Id" => X_test_full.Id,
                        "SalePrice" => preds_test)
 
 # ╔═╡ d8d8cc96-716d-4467-8642-f3fdb7dfbd99
-CSV.write("data\\home-data-for-ml-course\\submissions_02x01.csv", output)
+CSV.write("data//home-data-for-ml-course//submissions_02x01.csv", output)
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """

@@ -184,7 +184,7 @@ preds_test = predict(final_mach, final_X_test)
 begin
 	output = DataFrame("Id" => X_test.Id,
 	                       "SalePrice" => preds_test)
-	CSV.write("data\\home-data-for-ml-course\\submissions_02x02.csv", output)
+	CSV.write("data//home-data-for-ml-course//submissions_02x02.csv", output)
 end
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
