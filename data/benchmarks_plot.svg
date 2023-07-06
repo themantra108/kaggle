@@ -1,0 +1,805 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg"
+     xmlns:xlink="http://www.w3.org/1999/xlink"
+     xmlns:gadfly="http://www.gadflyjl.org/ns"
+     version="1.2"
+     width="228.6mm" height="141.28mm" viewBox="0 0 228.6 141.28"
+     stroke="none"
+     fill="#000000"
+     stroke-width="0.3"
+     font-size="3.88"
+>
+<defs>
+  <marker id="arrow" markerWidth="15" markerHeight="7" refX="5" refY="3.5" orient="auto" markerUnits="strokeWidth">
+    <path d="M0,0 L15,3.5 L0,7 z" stroke="context-stroke" fill="context-stroke"/>
+  </marker>
+</defs>
+<g class="plotroot yscalable" id="img-97764b1f-1">
+  <g class="guide xlabels" font-size="2.82" font-family="Georgia" fill="#6C606B" id="img-97764b1f-2">
+    <g transform="translate(18.57,132.65)">
+      <g class="primitive">
+        <text text-anchor="middle" dy="0.6em">C</text>
+      </g>
+    </g>
+    <g transform="translate(32.3,132.65)">
+      <g class="primitive">
+        <text text-anchor="middle" dy="0.6em">Julia</text>
+      </g>
+    </g>
+    <g transform="translate(46.03,132.65)">
+      <g class="primitive">
+        <text text-anchor="middle" dy="0.6em">Fortran</text>
+      </g>
+    </g>
+    <g transform="translate(59.76,132.65)">
+      <g class="primitive">
+        <text text-anchor="middle" dy="0.6em">Lua</text>
+      </g>
+    </g>
+    <g transform="translate(73.49,132.65)">
+      <g class="primitive">
+        <text text-anchor="middle" dy="0.6em">Rust</text>
+      </g>
+    </g>
+    <g transform="translate(87.22,132.65)">
+      <g class="primitive">
+        <text text-anchor="middle" dy="0.6em">Go</text>
+      </g>
+    </g>
+    <g transform="translate(100.95,132.65)">
+      <g class="primitive">
+        <text text-anchor="middle" dy="0.6em">Java</text>
+      </g>
+    </g>
+    <g transform="translate(114.68,132.65)">
+      <g class="primitive">
+        <text text-anchor="middle" dy="0.6em">Javascript</text>
+      </g>
+    </g>
+    <g transform="translate(128.42,132.65)">
+      <g class="primitive">
+        <text text-anchor="middle" dy="0.6em">Python</text>
+      </g>
+    </g>
+    <g transform="translate(142.15,132.65)">
+      <g class="primitive">
+        <text text-anchor="middle" dy="0.6em">R</text>
+      </g>
+    </g>
+  </g>
+  <g class="guide colorkey" id="img-97764b1f-3">
+    <g fill="#4C404B" font-size="2.82" font-family="'PT Sans','Helvetica Neue','Helvetica',sans-serif" id="img-97764b1f-4">
+      <g transform="translate(198.14,57.44)" id="img-97764b1f-5" class="color_iteration_pi_sum">
+        <g class="primitive">
+          <text dy="0.35em">iteration_pi_sum</text>
+        </g>
+      </g>
+      <g transform="translate(198.14,61.07)" id="img-97764b1f-6" class="color_matrix_multiply">
+        <g class="primitive">
+          <text dy="0.35em">matrix_multiply</text>
+        </g>
+      </g>
+      <g transform="translate(198.14,64.7)" id="img-97764b1f-7" class="color_matrix_statistics">
+        <g class="primitive">
+          <text dy="0.35em">matrix_statistics</text>
+        </g>
+      </g>
+      <g transform="translate(198.14,68.32)" id="img-97764b1f-8" class="color_parse_integers">
+        <g class="primitive">
+          <text dy="0.35em">parse_integers</text>
+        </g>
+      </g>
+      <g transform="translate(198.14,71.95)" id="img-97764b1f-9" class="color_print_to_file">
+        <g class="primitive">
+          <text dy="0.35em">print_to_file</text>
+        </g>
+      </g>
+      <g transform="translate(198.14,75.58)" id="img-97764b1f-10" class="color_recursion_fibonacci">
+        <g class="primitive">
+          <text dy="0.35em">recursion_fibonacci</text>
+        </g>
+      </g>
+      <g transform="translate(198.14,79.2)" id="img-97764b1f-11" class="color_recursion_quicksort">
+        <g class="primitive">
+          <text dy="0.35em">recursion_quicksort</text>
+        </g>
+      </g>
+      <g transform="translate(198.14,82.83)" id="img-97764b1f-12" class="color_userfunc_mandelbrot">
+        <g class="primitive">
+          <text dy="0.35em">userfunc_mandelbrot</text>
+        </g>
+      </g>
+    </g>
+    <g fill-opacity="1" id="img-97764b1f-13">
+      <g transform="translate(196.14,57.44)" id="img-97764b1f-14" class="color_iteration_pi_sum" stroke="#FFFFFF" fill="#00BFFF">
+        <circle cx="0" cy="0" r="0.91" class="primitive"/>
+      </g>
+      <g transform="translate(196.14,61.07)" id="img-97764b1f-15" class="color_matrix_multiply" stroke="#FFFFFF" fill="#D4CA3A">
+        <circle cx="0" cy="0" r="0.91" class="primitive"/>
+      </g>
+      <g transform="translate(196.14,64.7)" id="img-97764b1f-16" class="color_matrix_statistics" stroke="#FFFFFF" fill="#FF6DAE">
+        <circle cx="0" cy="0" r="0.91" class="primitive"/>
+      </g>
+      <g transform="translate(196.14,68.32)" id="img-97764b1f-17" class="color_parse_integers" stroke="#FFFFFF" fill="#00B78D">
+        <circle cx="0" cy="0" r="0.91" class="primitive"/>
+      </g>
+      <g transform="translate(196.14,71.95)" id="img-97764b1f-18" class="color_print_to_file" stroke="#FFFFFF" fill="#BEA9FF">
+        <circle cx="0" cy="0" r="0.91" class="primitive"/>
+      </g>
+      <g transform="translate(196.14,75.58)" id="img-97764b1f-19" class="color_recursion_fibonacci" stroke="#FFFFFF" fill="#FF6765">
+        <circle cx="0" cy="0" r="0.91" class="primitive"/>
+      </g>
+      <g transform="translate(196.14,79.2)" id="img-97764b1f-20" class="color_recursion_quicksort" stroke="#FFFFFF" fill="#C6C6C6">
+        <circle cx="0" cy="0" r="0.91" class="primitive"/>
+      </g>
+      <g transform="translate(196.14,82.83)" id="img-97764b1f-21" class="color_userfunc_mandelbrot" stroke="#FFFFFF" fill="#63DF75">
+        <circle cx="0" cy="0" r="0.91" class="primitive"/>
+      </g>
+    </g>
+    <g fill="#362A35" font-size="3.88" font-family="'PT Sans','Helvetica Neue','Helvetica',sans-serif" stroke="#000000" stroke-opacity="0.000" id="img-97764b1f-22">
+      <g transform="translate(195.33,53.62)" id="img-97764b1f-23">
+        <g class="primitive">
+          <text dy="-0em">benchmark</text>
+        </g>
+      </g>
+    </g>
+  </g>
+  <g clip-path="url(#img-97764b1f-24)">
+    <g id="img-97764b1f-25">
+      <g pointer-events="visible" stroke-width="0.3" fill="#000000" fill-opacity="0.000" stroke="#000000" stroke-opacity="0.000" class="guide background" id="img-97764b1f-26">
+        <g transform="translate(103.01,68.32)" id="img-97764b1f-27">
+          <path d="M-91.31,-63.32 L91.31,-63.32 91.31,63.32 -91.31,63.32  z" class="primitive"/>
+        </g>
+      </g>
+      <g class="guide ygridlines xfixed" stroke-dasharray="0.5,0.5" stroke-width="0.2" stroke="#D0D0E0" id="img-97764b1f-28">
+        <g transform="translate(103.01,116.6)" id="img-97764b1f-29">
+          <path fill="none" d="M-91.31,0 L91.31,0 " class="primitive"/>
+        </g>
+        <g transform="translate(103.01,90.51)" id="img-97764b1f-30">
+          <path fill="none" d="M-91.31,0 L91.31,0 " class="primitive"/>
+        </g>
+        <g transform="translate(103.01,64.41)" id="img-97764b1f-31">
+          <path fill="none" d="M-91.31,0 L91.31,0 " class="primitive"/>
+        </g>
+        <g transform="translate(103.01,38.31)" id="img-97764b1f-32">
+          <path fill="none" d="M-91.31,0 L91.31,0 " class="primitive"/>
+        </g>
+        <g transform="translate(103.01,12.22)" id="img-97764b1f-33">
+          <path fill="none" d="M-91.31,0 L91.31,0 " class="primitive"/>
+        </g>
+      </g>
+      <g class="guide xgridlines yfixed" stroke-dasharray="0.5,0.5" stroke-width="0.2" stroke="#D0D0E0" id="img-97764b1f-34">
+        <g transform="translate(25.43,68.32)" id="img-97764b1f-35">
+          <path fill="none" d="M0,-63.32 L0,63.32 " class="primitive"/>
+        </g>
+        <g transform="translate(39.16,68.32)" id="img-97764b1f-36">
+          <path fill="none" d="M0,-63.32 L0,63.32 " class="primitive"/>
+        </g>
+        <g transform="translate(52.89,68.32)" id="img-97764b1f-37">
+          <path fill="none" d="M0,-63.32 L0,63.32 " class="primitive"/>
+        </g>
+        <g transform="translate(66.63,68.32)" id="img-97764b1f-38">
+          <path fill="none" d="M0,-63.32 L0,63.32 " class="primitive"/>
+        </g>
+        <g transform="translate(80.36,68.32)" id="img-97764b1f-39">
+          <path fill="none" d="M0,-63.32 L0,63.32 " class="primitive"/>
+        </g>
+        <g transform="translate(94.09,68.32)" id="img-97764b1f-40">
+          <path fill="none" d="M0,-63.32 L0,63.32 " class="primitive"/>
+        </g>
+        <g transform="translate(107.82,68.32)" id="img-97764b1f-41">
+          <path fill="none" d="M0,-63.32 L0,63.32 " class="primitive"/>
+        </g>
+        <g transform="translate(121.55,68.32)" id="img-97764b1f-42">
+          <path fill="none" d="M0,-63.32 L0,63.32 " class="primitive"/>
+        </g>
+        <g transform="translate(135.28,68.32)" id="img-97764b1f-43">
+          <path fill="none" d="M0,-63.32 L0,63.32 " class="primitive"/>
+        </g>
+      </g>
+      <g class="plotpanel" id="img-97764b1f-44">
+        <metadata>
+          <boundingbox value="11.699999999999989mm 5.0mm 182.62666666666667mm 126.64923649489262mm"/>
+          <unitbox value="0.5 4.27664132503908 13.3 -4.8532826500781585"/>
+        </metadata>
+        <g class="geometry" id="img-97764b1f-45">
+          <g stroke-width="0.3" id="img-97764b1f-46">
+            <g class="color_userfunc_mandelbrot" fill-opacity="1" stroke="#FFFFFF" fill="#63DF75" id="img-97764b1f-47">
+              <g class="marker" id="img-97764b1f-48">
+                <g transform="translate(142.15,50.98)" id="img-97764b1f-49">
+                  <circle cx="0" cy="0" r="0.9" class="primitive"/>
+                </g>
+              </g>
+            </g>
+            <g class="color_recursion_quicksort" fill-opacity="1" stroke="#FFFFFF" fill="#C6C6C6" id="img-97764b1f-50">
+              <g class="marker" id="img-97764b1f-51">
+                <g transform="translate(142.15,69.31)" id="img-97764b1f-52">
+                  <circle cx="0" cy="0" r="0.9" class="primitive"/>
+                </g>
+              </g>
+            </g>
+            <g class="color_recursion_fibonacci" fill-opacity="1" stroke="#FFFFFF" fill="#FF6765" id="img-97764b1f-53">
+              <g class="marker" id="img-97764b1f-54">
+                <g transform="translate(142.15,43.33)" id="img-97764b1f-55">
+                  <circle cx="0" cy="0" r="0.9" class="primitive"/>
+                </g>
+              </g>
+            </g>
+            <g class="color_print_to_file" fill-opacity="1" stroke="#FFFFFF" fill="#BEA9FF" id="img-97764b1f-56">
+              <g class="marker" id="img-97764b1f-57">
+                <g transform="translate(142.15,61.19)" id="img-97764b1f-58">
+                  <circle cx="0" cy="0" r="0.9" class="primitive"/>
+                </g>
+              </g>
+            </g>
+            <g class="color_parse_integers" fill-opacity="1" stroke="#FFFFFF" fill="#00B78D" id="img-97764b1f-59">
+              <g class="marker" id="img-97764b1f-60">
+                <g transform="translate(142.15,74.62)" id="img-97764b1f-61">
+                  <circle cx="0" cy="0" r="0.9" class="primitive"/>
+                </g>
+              </g>
+            </g>
+            <g class="color_matrix_statistics" fill-opacity="1" stroke="#FFFFFF" fill="#FF6DAE" id="img-97764b1f-62">
+              <g class="marker" id="img-97764b1f-63">
+                <g transform="translate(142.15,84.39)" id="img-97764b1f-64">
+                  <circle cx="0" cy="0" r="0.9" class="primitive"/>
+                </g>
+              </g>
+            </g>
+            <g class="color_matrix_multiply" fill-opacity="1" stroke="#FFFFFF" fill="#D4CA3A" id="img-97764b1f-65">
+              <g class="marker" id="img-97764b1f-66">
+                <g transform="translate(142.15,108.66)" id="img-97764b1f-67">
+                  <circle cx="0" cy="0" r="0.9" class="primitive"/>
+                </g>
+              </g>
+            </g>
+            <g class="color_iteration_pi_sum" fill-opacity="1" stroke="#FFFFFF" fill="#00BFFF" id="img-97764b1f-68">
+              <g class="marker" id="img-97764b1f-69">
+                <g transform="translate(142.15,77.74)" id="img-97764b1f-70">
+                  <circle cx="0" cy="0" r="0.9" class="primitive"/>
+                </g>
+              </g>
+            </g>
+            <g class="color_userfunc_mandelbrot" fill-opacity="1" stroke="#FFFFFF" fill="#63DF75" id="img-97764b1f-71">
+              <g class="marker" id="img-97764b1f-72">
+                <g transform="translate(128.42,65.81)" id="img-97764b1f-73">
+                  <circle cx="0" cy="0" r="0.9" class="primitive"/>
+                </g>
+              </g>
+            </g>
+            <g class="color_recursion_quicksort" fill-opacity="1" stroke="#FFFFFF" fill="#C6C6C6" id="img-97764b1f-74">
+              <g class="marker" id="img-97764b1f-75">
+                <g transform="translate(128.42,85.85)" id="img-97764b1f-76">
+                  <circle cx="0" cy="0" r="0.9" class="primitive"/>
+                </g>
+              </g>
+            </g>
+            <g class="color_recursion_fibonacci" fill-opacity="1" stroke="#FFFFFF" fill="#FF6765" id="img-97764b1f-77">
+              <g class="marker" id="img-97764b1f-78">
+                <g transform="translate(128.42,66.7)" id="img-97764b1f-79">
+                  <circle cx="0" cy="0" r="0.9" class="primitive"/>
+                </g>
+              </g>
+            </g>
+            <g class="color_print_to_file" fill-opacity="1" stroke="#FFFFFF" fill="#BEA9FF" id="img-97764b1f-80">
+              <g class="marker" id="img-97764b1f-81">
+                <g transform="translate(128.42,99.75)" id="img-97764b1f-82">
+                  <circle cx="0" cy="0" r="0.9" class="primitive"/>
+                </g>
+              </g>
+            </g>
+            <g class="color_parse_integers" fill-opacity="1" stroke="#FFFFFF" fill="#00B78D" id="img-97764b1f-83">
+              <g class="marker" id="img-97764b1f-84">
+                <g transform="translate(128.42,92.93)" id="img-97764b1f-85">
+                  <circle cx="0" cy="0" r="0.9" class="primitive"/>
+                </g>
+              </g>
+            </g>
+            <g class="color_matrix_statistics" fill-opacity="1" stroke="#FFFFFF" fill="#FF6DAE" id="img-97764b1f-86">
+              <g class="marker" id="img-97764b1f-87">
+                <g transform="translate(128.42,91.09)" id="img-97764b1f-88">
+                  <circle cx="0" cy="0" r="0.9" class="primitive"/>
+                </g>
+              </g>
+            </g>
+            <g class="color_matrix_multiply" fill-opacity="1" stroke="#FFFFFF" fill="#D4CA3A" id="img-97764b1f-89">
+              <g class="marker" id="img-97764b1f-90">
+                <g transform="translate(128.42,115.17)" id="img-97764b1f-91">
+                  <circle cx="0" cy="0" r="0.9" class="primitive"/>
+                </g>
+              </g>
+            </g>
+            <g class="color_iteration_pi_sum" fill-opacity="1" stroke="#FFFFFF" fill="#00BFFF" id="img-97764b1f-92">
+              <g class="marker" id="img-97764b1f-93">
+                <g transform="translate(128.42,70.25)" id="img-97764b1f-94">
+                  <circle cx="0" cy="0" r="0.9" class="primitive"/>
+                </g>
+              </g>
+            </g>
+            <g class="color_userfunc_mandelbrot" fill-opacity="1" stroke="#FFFFFF" fill="#63DF75" id="img-97764b1f-95">
+              <g class="marker" id="img-97764b1f-96">
+                <g transform="translate(114.68,97.78)" id="img-97764b1f-97">
+                  <circle cx="0" cy="0" r="0.9" class="primitive"/>
+                </g>
+              </g>
+            </g>
+            <g class="color_recursion_quicksort" fill-opacity="1" stroke="#FFFFFF" fill="#C6C6C6" id="img-97764b1f-98">
+              <g class="marker" id="img-97764b1f-99">
+                <g transform="translate(114.68,100.61)" id="img-97764b1f-100">
+                  <circle cx="0" cy="0" r="0.9" class="primitive"/>
+                </g>
+              </g>
+            </g>
+            <g class="color_recursion_fibonacci" fill-opacity="1" stroke="#FFFFFF" fill="#FF6765" id="img-97764b1f-101">
+              <g class="marker" id="img-97764b1f-102">
+                <g transform="translate(114.68,94.82)" id="img-97764b1f-103">
+                  <circle cx="0" cy="0" r="0.9" class="primitive"/>
+                </g>
+              </g>
+            </g>
+            <g class="color_print_to_file" fill-opacity="1" stroke="#FFFFFF" fill="#BEA9FF" id="img-97764b1f-104">
+              <g class="marker" id="img-97764b1f-105">
+                <g transform="translate(114.68,91.08)" id="img-97764b1f-106">
+                  <circle cx="0" cy="0" r="0.9" class="primitive"/>
+                </g>
+              </g>
+            </g>
+            <g class="color_parse_integers" fill-opacity="1" stroke="#FFFFFF" fill="#00B78D" id="img-97764b1f-107">
+              <g class="marker" id="img-97764b1f-108">
+                <g transform="translate(114.68,99.04)" id="img-97764b1f-109">
+                  <circle cx="0" cy="0" r="0.9" class="primitive"/>
+                </g>
+              </g>
+            </g>
+            <g class="color_matrix_statistics" fill-opacity="1" stroke="#FFFFFF" fill="#FF6DAE" id="img-97764b1f-110">
+              <g class="marker" id="img-97764b1f-111">
+                <g transform="translate(114.68,93.88)" id="img-97764b1f-112">
+                  <circle cx="0" cy="0" r="0.9" class="primitive"/>
+                </g>
+              </g>
+            </g>
+            <g class="color_matrix_multiply" fill-opacity="1" stroke="#FFFFFF" fill="#D4CA3A" id="img-97764b1f-113">
+              <g class="marker" id="img-97764b1f-114">
+                <g transform="translate(114.68,76.81)" id="img-97764b1f-115">
+                  <circle cx="0" cy="0" r="0.9" class="primitive"/>
+                </g>
+              </g>
+            </g>
+            <g class="color_iteration_pi_sum" fill-opacity="1" stroke="#FFFFFF" fill="#00BFFF" id="img-97764b1f-116">
+              <g class="marker" id="img-97764b1f-117">
+                <g transform="translate(114.68,115.01)" id="img-97764b1f-118">
+                  <circle cx="0" cy="0" r="0.9" class="primitive"/>
+                </g>
+              </g>
+            </g>
+            <g class="color_userfunc_mandelbrot" fill-opacity="1" stroke="#FFFFFF" fill="#63DF75" id="img-97764b1f-119">
+              <g class="marker" id="img-97764b1f-120">
+                <g transform="translate(100.95,109.62)" id="img-97764b1f-121">
+                  <circle cx="0" cy="0" r="0.9" class="primitive"/>
+                </g>
+              </g>
+            </g>
+            <g class="color_recursion_quicksort" fill-opacity="1" stroke="#FFFFFF" fill="#C6C6C6" id="img-97764b1f-122">
+              <g class="marker" id="img-97764b1f-123">
+                <g transform="translate(100.95,103.41)" id="img-97764b1f-124">
+                  <circle cx="0" cy="0" r="0.9" class="primitive"/>
+                </g>
+              </g>
+            </g>
+            <g class="color_recursion_fibonacci" fill-opacity="1" stroke="#FFFFFF" fill="#FF6765" id="img-97764b1f-125">
+              <g class="marker" id="img-97764b1f-126">
+                <g transform="translate(100.95,97.12)" id="img-97764b1f-127">
+                  <circle cx="0" cy="0" r="0.9" class="primitive"/>
+                </g>
+              </g>
+            </g>
+            <g class="color_print_to_file" fill-opacity="1" stroke="#FFFFFF" fill="#BEA9FF" id="img-97764b1f-128">
+              <g class="marker" id="img-97764b1f-129">
+                <g transform="translate(100.95,92.97)" id="img-97764b1f-130">
+                  <circle cx="0" cy="0" r="0.9" class="primitive"/>
+                </g>
+              </g>
+            </g>
+            <g class="color_parse_integers" fill-opacity="1" stroke="#FFFFFF" fill="#00B78D" id="img-97764b1f-131">
+              <g class="marker" id="img-97764b1f-132">
+                <g transform="translate(100.95,100.38)" id="img-97764b1f-133">
+                  <circle cx="0" cy="0" r="0.9" class="primitive"/>
+                </g>
+              </g>
+            </g>
+            <g class="color_matrix_statistics" fill-opacity="1" stroke="#FFFFFF" fill="#FF6DAE" id="img-97764b1f-134">
+              <g class="marker" id="img-97764b1f-135">
+                <g transform="translate(100.95,98.46)" id="img-97764b1f-136">
+                  <circle cx="0" cy="0" r="0.9" class="primitive"/>
+                </g>
+              </g>
+            </g>
+            <g class="color_matrix_multiply" fill-opacity="1" stroke="#FFFFFF" fill="#D4CA3A" id="img-97764b1f-137">
+              <g class="marker" id="img-97764b1f-138">
+                <g transform="translate(100.95,89.87)" id="img-97764b1f-139">
+                  <circle cx="0" cy="0" r="0.9" class="primitive"/>
+                </g>
+              </g>
+            </g>
+            <g class="color_iteration_pi_sum" fill-opacity="1" stroke="#FFFFFF" fill="#00BFFF" id="img-97764b1f-140">
+              <g class="marker" id="img-97764b1f-141">
+                <g transform="translate(100.95,109.15)" id="img-97764b1f-142">
+                  <circle cx="0" cy="0" r="0.9" class="primitive"/>
+                </g>
+              </g>
+            </g>
+            <g class="color_userfunc_mandelbrot" fill-opacity="1" stroke="#FFFFFF" fill="#63DF75" id="img-97764b1f-143">
+              <g class="marker" id="img-97764b1f-144">
+                <g transform="translate(87.22,116.55)" id="img-97764b1f-145">
+                  <circle cx="0" cy="0" r="0.9" class="primitive"/>
+                </g>
+              </g>
+            </g>
+            <g class="color_recursion_quicksort" fill-opacity="1" stroke="#FFFFFF" fill="#C6C6C6" id="img-97764b1f-146">
+              <g class="marker" id="img-97764b1f-147">
+                <g transform="translate(87.22,113.5)" id="img-97764b1f-148">
+                  <circle cx="0" cy="0" r="0.9" class="primitive"/>
+                </g>
+              </g>
+            </g>
+            <g class="color_recursion_fibonacci" fill-opacity="1" stroke="#FFFFFF" fill="#FF6765" id="img-97764b1f-149">
+              <g class="marker" id="img-97764b1f-150">
+                <g transform="translate(87.22,105.51)" id="img-97764b1f-151">
+                  <circle cx="0" cy="0" r="0.9" class="primitive"/>
+                </g>
+              </g>
+            </g>
+            <g class="color_print_to_file" fill-opacity="1" stroke="#FFFFFF" fill="#BEA9FF" id="img-97764b1f-152">
+              <g class="marker" id="img-97764b1f-153">
+                <g transform="translate(87.22,110.45)" id="img-97764b1f-154">
+                  <circle cx="0" cy="0" r="0.9" class="primitive"/>
+                </g>
+              </g>
+            </g>
+            <g class="color_parse_integers" fill-opacity="1" stroke="#FFFFFF" fill="#00B78D" id="img-97764b1f-155">
+              <g class="marker" id="img-97764b1f-156">
+                <g transform="translate(87.22,117.01)" id="img-97764b1f-157">
+                  <circle cx="0" cy="0" r="0.9" class="primitive"/>
+                </g>
+              </g>
+            </g>
+            <g class="color_matrix_statistics" fill-opacity="1" stroke="#FFFFFF" fill="#FF6DAE" id="img-97764b1f-158">
+              <g class="marker" id="img-97764b1f-159">
+                <g transform="translate(87.22,97.37)" id="img-97764b1f-160">
+                  <circle cx="0" cy="0" r="0.9" class="primitive"/>
+                </g>
+              </g>
+            </g>
+            <g class="color_matrix_multiply" fill-opacity="1" stroke="#FFFFFF" fill="#D4CA3A" id="img-97764b1f-161">
+              <g class="marker" id="img-97764b1f-162">
+                <g transform="translate(87.22,100.92)" id="img-97764b1f-163">
+                  <circle cx="0" cy="0" r="0.9" class="primitive"/>
+                </g>
+              </g>
+            </g>
+            <g class="color_iteration_pi_sum" fill-opacity="1" stroke="#FFFFFF" fill="#00BFFF" id="img-97764b1f-164">
+              <g class="marker" id="img-97764b1f-165">
+                <g transform="translate(87.22,115.36)" id="img-97764b1f-166">
+                  <circle cx="0" cy="0" r="0.9" class="primitive"/>
+                </g>
+              </g>
+            </g>
+            <g class="color_userfunc_mandelbrot" fill-opacity="1" stroke="#FFFFFF" fill="#63DF75" id="img-97764b1f-167">
+              <g class="marker" id="img-97764b1f-168">
+                <g transform="translate(73.49,117.52)" id="img-97764b1f-169">
+                  <circle cx="0" cy="0" r="0.9" class="primitive"/>
+                </g>
+              </g>
+            </g>
+            <g class="color_recursion_quicksort" fill-opacity="1" stroke="#FFFFFF" fill="#C6C6C6" id="img-97764b1f-170">
+              <g class="marker" id="img-97764b1f-171">
+                <g transform="translate(73.49,115.59)" id="img-97764b1f-172">
+                  <circle cx="0" cy="0" r="0.9" class="primitive"/>
+                </g>
+              </g>
+            </g>
+            <g class="color_recursion_fibonacci" fill-opacity="1" stroke="#FFFFFF" fill="#FF6765" id="img-97764b1f-173">
+              <g class="marker" id="img-97764b1f-174">
+                <g transform="translate(73.49,104.93)" id="img-97764b1f-175">
+                  <circle cx="0" cy="0" r="0.9" class="primitive"/>
+                </g>
+              </g>
+            </g>
+            <g class="color_print_to_file" fill-opacity="1" stroke="#FFFFFF" fill="#BEA9FF" id="img-97764b1f-176">
+              <g class="marker" id="img-97764b1f-177">
+                <g transform="translate(73.49,118.16)" id="img-97764b1f-178">
+                  <circle cx="0" cy="0" r="0.9" class="primitive"/>
+                </g>
+              </g>
+            </g>
+            <g class="color_parse_integers" fill-opacity="1" stroke="#FFFFFF" fill="#00B78D" id="img-97764b1f-179">
+              <g class="marker" id="img-97764b1f-180">
+                <g transform="translate(73.49,113.19)" id="img-97764b1f-181">
+                  <circle cx="0" cy="0" r="0.9" class="primitive"/>
+                </g>
+              </g>
+            </g>
+            <g class="color_matrix_statistics" fill-opacity="1" stroke="#FFFFFF" fill="#FF6DAE" id="img-97764b1f-182">
+              <g class="marker" id="img-97764b1f-183">
+                <g transform="translate(73.49,113.53)" id="img-97764b1f-184">
+                  <circle cx="0" cy="0" r="0.9" class="primitive"/>
+                </g>
+              </g>
+            </g>
+            <g class="color_matrix_multiply" fill-opacity="1" stroke="#FFFFFF" fill="#D4CA3A" id="img-97764b1f-185">
+              <g class="marker" id="img-97764b1f-186">
+                <g transform="translate(73.49,115.8)" id="img-97764b1f-187">
+                  <circle cx="0" cy="0" r="0.9" class="primitive"/>
+                </g>
+              </g>
+            </g>
+            <g class="color_iteration_pi_sum" fill-opacity="1" stroke="#FFFFFF" fill="#00BFFF" id="img-97764b1f-188">
+              <g class="marker" id="img-97764b1f-189">
+                <g transform="translate(73.49,115.82)" id="img-97764b1f-190">
+                  <circle cx="0" cy="0" r="0.9" class="primitive"/>
+                </g>
+              </g>
+            </g>
+            <g class="color_userfunc_mandelbrot" fill-opacity="1" stroke="#FFFFFF" fill="#63DF75" id="img-97764b1f-191">
+              <g class="marker" id="img-97764b1f-192">
+                <g transform="translate(59.76,114.69)" id="img-97764b1f-193">
+                  <circle cx="0" cy="0" r="0.9" class="primitive"/>
+                </g>
+              </g>
+            </g>
+            <g class="color_recursion_quicksort" fill-opacity="1" stroke="#FFFFFF" fill="#C6C6C6" id="img-97764b1f-194">
+              <g class="marker" id="img-97764b1f-195">
+                <g transform="translate(59.76,112.22)" id="img-97764b1f-196">
+                  <circle cx="0" cy="0" r="0.9" class="primitive"/>
+                </g>
+              </g>
+            </g>
+            <g class="color_recursion_fibonacci" fill-opacity="1" stroke="#FFFFFF" fill="#FF6765" id="img-97764b1f-197">
+              <g class="marker" id="img-97764b1f-198">
+                <g transform="translate(59.76,109.51)" id="img-97764b1f-199">
+                  <circle cx="0" cy="0" r="0.9" class="primitive"/>
+                </g>
+              </g>
+            </g>
+            <g class="color_print_to_file" fill-opacity="1" stroke="#FFFFFF" fill="#BEA9FF" id="img-97764b1f-200">
+              <g class="marker" id="img-97764b1f-201">
+                <g transform="translate(59.76,120.05)" id="img-97764b1f-202">
+                  <circle cx="0" cy="0" r="0.9" class="primitive"/>
+                </g>
+              </g>
+            </g>
+            <g class="color_parse_integers" fill-opacity="1" stroke="#FFFFFF" fill="#00B78D" id="img-97764b1f-203">
+              <g class="marker" id="img-97764b1f-204">
+                <g transform="translate(59.76,117.88)" id="img-97764b1f-205">
+                  <circle cx="0" cy="0" r="0.9" class="primitive"/>
+                </g>
+              </g>
+            </g>
+            <g class="color_matrix_statistics" fill-opacity="1" stroke="#FFFFFF" fill="#FF6DAE" id="img-97764b1f-206">
+              <g class="marker" id="img-97764b1f-207">
+                <g transform="translate(59.76,110.43)" id="img-97764b1f-208">
+                  <circle cx="0" cy="0" r="0.9" class="primitive"/>
+                </g>
+              </g>
+            </g>
+            <g class="color_matrix_multiply" fill-opacity="1" stroke="#FFFFFF" fill="#D4CA3A" id="img-97764b1f-209">
+              <g class="marker" id="img-97764b1f-210">
+                <g transform="translate(59.76,112.8)" id="img-97764b1f-211">
+                  <circle cx="0" cy="0" r="0.9" class="primitive"/>
+                </g>
+              </g>
+            </g>
+            <g class="color_iteration_pi_sum" fill-opacity="1" stroke="#FFFFFF" fill="#00BFFF" id="img-97764b1f-212">
+              <g class="marker" id="img-97764b1f-213">
+                <g transform="translate(59.76,117.13)" id="img-97764b1f-214">
+                  <circle cx="0" cy="0" r="0.9" class="primitive"/>
+                </g>
+              </g>
+            </g>
+            <g class="color_userfunc_mandelbrot" fill-opacity="1" stroke="#FFFFFF" fill="#63DF75" id="img-97764b1f-215">
+              <g class="marker" id="img-97764b1f-216">
+                <g transform="translate(46.03,197.07)" id="img-97764b1f-217">
+                  <circle cx="0" cy="0" r="0.9" class="primitive"/>
+                </g>
+              </g>
+            </g>
+            <g class="color_recursion_quicksort" fill-opacity="1" stroke="#FFFFFF" fill="#C6C6C6" id="img-97764b1f-218">
+              <g class="marker" id="img-97764b1f-219">
+                <g transform="translate(46.03,114.12)" id="img-97764b1f-220">
+                  <circle cx="0" cy="0" r="0.9" class="primitive"/>
+                </g>
+              </g>
+            </g>
+            <g class="color_recursion_fibonacci" fill-opacity="1" stroke="#FFFFFF" fill="#FF6765" id="img-97764b1f-221">
+              <g class="marker" id="img-97764b1f-222">
+                <g transform="translate(46.03,184.72)" id="img-97764b1f-223">
+                  <circle cx="0" cy="0" r="0.9" class="primitive"/>
+                </g>
+              </g>
+            </g>
+            <g class="color_print_to_file" fill-opacity="1" stroke="#FFFFFF" fill="#BEA9FF" id="img-97764b1f-224">
+              <g class="marker" id="img-97764b1f-225">
+                <g transform="translate(46.03,93.79)" id="img-97764b1f-226">
+                  <circle cx="0" cy="0" r="0.9" class="primitive"/>
+                </g>
+              </g>
+            </g>
+            <g class="color_parse_integers" fill-opacity="1" stroke="#FFFFFF" fill="#00B78D" id="img-97764b1f-227">
+              <g class="marker" id="img-97764b1f-228">
+                <g transform="translate(46.03,123.36)" id="img-97764b1f-229">
+                  <circle cx="0" cy="0" r="0.9" class="primitive"/>
+                </g>
+              </g>
+            </g>
+            <g class="color_matrix_statistics" fill-opacity="1" stroke="#FFFFFF" fill="#FF6DAE" id="img-97764b1f-230">
+              <g class="marker" id="img-97764b1f-231">
+                <g transform="translate(46.03,115.56)" id="img-97764b1f-232">
+                  <circle cx="0" cy="0" r="0.9" class="primitive"/>
+                </g>
+              </g>
+            </g>
+            <g class="color_matrix_multiply" fill-opacity="1" stroke="#FFFFFF" fill="#D4CA3A" id="img-97764b1f-233">
+              <g class="marker" id="img-97764b1f-234">
+                <g transform="translate(46.03,115.29)" id="img-97764b1f-235">
+                  <circle cx="0" cy="0" r="0.9" class="primitive"/>
+                </g>
+              </g>
+            </g>
+            <g class="color_iteration_pi_sum" fill-opacity="1" stroke="#FFFFFF" fill="#00BFFF" id="img-97764b1f-236">
+              <g class="marker" id="img-97764b1f-237">
+                <g transform="translate(46.03,117.08)" id="img-97764b1f-238">
+                  <circle cx="0" cy="0" r="0.9" class="primitive"/>
+                </g>
+              </g>
+            </g>
+            <g class="color_userfunc_mandelbrot" fill-opacity="1" stroke="#FFFFFF" fill="#63DF75" id="img-97764b1f-239">
+              <g class="marker" id="img-97764b1f-240">
+                <g transform="translate(32.3,120)" id="img-97764b1f-241">
+                  <circle cx="0" cy="0" r="0.9" class="primitive"/>
+                </g>
+              </g>
+            </g>
+            <g class="color_recursion_quicksort" fill-opacity="1" stroke="#FFFFFF" fill="#C6C6C6" id="img-97764b1f-242">
+              <g class="marker" id="img-97764b1f-243">
+                <g transform="translate(32.3,115.35)" id="img-97764b1f-244">
+                  <circle cx="0" cy="0" r="0.9" class="primitive"/>
+                </g>
+              </g>
+            </g>
+            <g class="color_recursion_fibonacci" fill-opacity="1" stroke="#FFFFFF" fill="#FF6765" id="img-97764b1f-245">
+              <g class="marker" id="img-97764b1f-246">
+                <g transform="translate(32.3,106.68)" id="img-97764b1f-247">
+                  <circle cx="0" cy="0" r="0.9" class="primitive"/>
+                </g>
+              </g>
+            </g>
+            <g class="color_print_to_file" fill-opacity="1" stroke="#FFFFFF" fill="#BEA9FF" id="img-97764b1f-248">
+              <g class="marker" id="img-97764b1f-249">
+                <g transform="translate(32.3,114.29)" id="img-97764b1f-250">
+                  <circle cx="0" cy="0" r="0.9" class="primitive"/>
+                </g>
+              </g>
+            </g>
+            <g class="color_parse_integers" fill-opacity="1" stroke="#FFFFFF" fill="#00B78D" id="img-97764b1f-251">
+              <g class="marker" id="img-97764b1f-252">
+                <g transform="translate(32.3,118.24)" id="img-97764b1f-253">
+                  <circle cx="0" cy="0" r="0.9" class="primitive"/>
+                </g>
+              </g>
+            </g>
+            <g class="color_matrix_statistics" fill-opacity="1" stroke="#FFFFFF" fill="#FF6DAE" id="img-97764b1f-254">
+              <g class="marker" id="img-97764b1f-255">
+                <g transform="translate(32.3,109.62)" id="img-97764b1f-256">
+                  <circle cx="0" cy="0" r="0.9" class="primitive"/>
+                </g>
+              </g>
+            </g>
+            <g class="color_matrix_multiply" fill-opacity="1" stroke="#FFFFFF" fill="#D4CA3A" id="img-97764b1f-257">
+              <g class="marker" id="img-97764b1f-258">
+                <g transform="translate(32.3,117.67)" id="img-97764b1f-259">
+                  <circle cx="0" cy="0" r="0.9" class="primitive"/>
+                </g>
+              </g>
+            </g>
+            <g class="color_iteration_pi_sum" fill-opacity="1" stroke="#FFFFFF" fill="#00BFFF" id="img-97764b1f-260">
+              <g class="marker" id="img-97764b1f-261">
+                <g transform="translate(32.3,116.97)" id="img-97764b1f-262">
+                  <circle cx="0" cy="0" r="0.9" class="primitive"/>
+                </g>
+              </g>
+            </g>
+            <g class="color_userfunc_mandelbrot" fill-opacity="1" stroke="#FFFFFF" fill="#63DF75" id="img-97764b1f-263">
+              <g class="marker" id="img-97764b1f-264">
+                <g transform="translate(18.57,116.6)" id="img-97764b1f-265">
+                  <circle cx="0" cy="0" r="0.9" class="primitive"/>
+                </g>
+              </g>
+            </g>
+            <g class="color_recursion_quicksort" fill-opacity="1" stroke="#FFFFFF" fill="#C6C6C6" id="img-97764b1f-266">
+              <g class="marker" id="img-97764b1f-267">
+                <g transform="translate(18.57,116.6)" id="img-97764b1f-268">
+                  <circle cx="0" cy="0" r="0.9" class="primitive"/>
+                </g>
+              </g>
+            </g>
+            <g class="color_recursion_fibonacci" fill-opacity="1" stroke="#FFFFFF" fill="#FF6765" id="img-97764b1f-269">
+              <g class="marker" id="img-97764b1f-270">
+                <g transform="translate(18.57,116.6)" id="img-97764b1f-271">
+                  <circle cx="0" cy="0" r="0.9" class="primitive"/>
+                </g>
+              </g>
+            </g>
+            <g class="color_print_to_file" fill-opacity="1" stroke="#FFFFFF" fill="#BEA9FF" id="img-97764b1f-272">
+              <g class="marker" id="img-97764b1f-273">
+                <g transform="translate(18.57,116.6)" id="img-97764b1f-274">
+                  <circle cx="0" cy="0" r="0.9" class="primitive"/>
+                </g>
+              </g>
+            </g>
+            <g class="color_parse_integers" fill-opacity="1" stroke="#FFFFFF" fill="#00B78D" id="img-97764b1f-275">
+              <g class="marker" id="img-97764b1f-276">
+                <g transform="translate(18.57,116.6)" id="img-97764b1f-277">
+                  <circle cx="0" cy="0" r="0.9" class="primitive"/>
+                </g>
+              </g>
+            </g>
+            <g class="color_matrix_statistics" fill-opacity="1" stroke="#FFFFFF" fill="#FF6DAE" id="img-97764b1f-278">
+              <g class="marker" id="img-97764b1f-279">
+                <g transform="translate(18.57,116.6)" id="img-97764b1f-280">
+                  <circle cx="0" cy="0" r="0.9" class="primitive"/>
+                </g>
+              </g>
+            </g>
+            <g class="color_matrix_multiply" fill-opacity="1" stroke="#FFFFFF" fill="#D4CA3A" id="img-97764b1f-281">
+              <g class="marker" id="img-97764b1f-282">
+                <g transform="translate(18.57,116.6)" id="img-97764b1f-283">
+                  <circle cx="0" cy="0" r="0.9" class="primitive"/>
+                </g>
+              </g>
+            </g>
+            <g class="color_iteration_pi_sum" fill-opacity="1" stroke="#FFFFFF" fill="#00BFFF" id="img-97764b1f-284">
+              <g class="marker" id="img-97764b1f-285">
+                <g transform="translate(18.57,116.6)" id="img-97764b1f-286">
+                  <circle cx="0" cy="0" r="0.9" class="primitive"/>
+                </g>
+              </g>
+            </g>
+          </g>
+        </g>
+      </g>
+    </g>
+  </g>
+  <g class="guide ylabels" font-size="2.82" font-family="Georgia" fill="#6C606B" id="img-97764b1f-287">
+    <g transform="translate(10.7,116.6)" id="img-97764b1f-288">
+      <g class="primitive">
+        <text text-anchor="end" dy="0.35em">10<tspan dy="-0.4em" font-size="83%">0</tspan></text>
+      </g>
+    </g>
+    <g transform="translate(10.7,90.51)" id="img-97764b1f-289">
+      <g class="primitive">
+        <text text-anchor="end" dy="0.35em">10<tspan dy="-0.4em" font-size="83%">1</tspan></text>
+      </g>
+    </g>
+    <g transform="translate(10.7,64.41)" id="img-97764b1f-290">
+      <g class="primitive">
+        <text text-anchor="end" dy="0.35em">10<tspan dy="-0.4em" font-size="83%">2</tspan></text>
+      </g>
+    </g>
+    <g transform="translate(10.7,38.31)" id="img-97764b1f-291">
+      <g class="primitive">
+        <text text-anchor="end" dy="0.35em">10<tspan dy="-0.4em" font-size="83%">3</tspan></text>
+      </g>
+    </g>
+    <g transform="translate(10.7,12.22)" id="img-97764b1f-292">
+      <g class="primitive">
+        <text text-anchor="end" dy="0.35em">10<tspan dy="-0.4em" font-size="83%">4</tspan></text>
+      </g>
+    </g>
+  </g>
+</g>
+<defs>
+  <clipPath id="img-97764b1f-24">
+    <path d="M11.7,5 L194.33,5 194.33,131.65 11.7,131.65 " />
+  </clipPath>
+</defs>
+</svg>
