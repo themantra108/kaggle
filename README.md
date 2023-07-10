@@ -1,0 +1,1 @@
+[![Export Pluto notebooks](https://github.com/themantra108/staticPlutoTemplate/actions/workflows/ExportPluto.yaml/badge.svg)](https://github.com/themantra108/staticPlutoTemplate/actions/workflows/ExportPluto.yaml)
